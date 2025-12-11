@@ -1,469 +1,620 @@
+:root {
+  --ink-80: rgba(255, 255, 255, .8);
+  --paw-glow: 12px;
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    font-family: "Pretendard", sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #111;
+  margin: 0;
+  height: 100%;
 }
 
-a {
-    text-decoration: none;
-    color: #222;
+body {
+  background: #000;
+  color: #fff;
+  font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 15px;
-    position: relative;
+/* ========================= 헤더 ========================= */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 72px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: transparent;
 }
 
-header .login-box {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+.brand img {
+  height: 22px;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, .6));
 }
 
+.gnb {
+  display: flex;
+  gap: 28px;
+}
+
+.gnb a {
+  color: var(--ink-80);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.gnb a:hover {
+  color: #fff;
+}
+
+/* (기본) 떠 있는 로그인 버튼 — FAB은 main.ejs의 .fab-login 사용 */
+.login-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .35);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px);
+}
+
+/* ========================= 히어로 ========================= */
+.hero {
+  position: relative;
+  height: 110vh;
+  overflow: hidden;
+  background: #000 url('../img/maintype.png') center/cover no-repeat;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(120% 80% at 50% 40%,
+      rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 55%, rgba(0, 0, 0, .9) 100%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  bottom: 200px;
+}
+
+.logotype img {
+  width: 800px;
+  max-width: 75vw;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, .9));
+}
+
+.subtitle {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: -30px;
+  opacity: .9;
+}
+
+/* 발자국 */
+.paw-trail {
+  position: absolute;
+  left: 50%;
+  bottom: 20vh;
+  transform: translateX(-50%);
+  width: min(720px, 86vw);
+  height: 36vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(16px, 4vw, 48px);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.paw {
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+  transition: transform .6s ease, opacity .6s ease, filter .6s ease;
+  animation: glowPulse 3.5s ease-in-out infinite;
+}
+
+.paw svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: #fff;
+}
+
+.paw:nth-child(1) {
+  transform: translateY(10px) rotate(-6deg) scale(0.9);
+}
+
+.paw:nth-child(2) {
+  transform: translateY(0px) rotate(-2deg) scale(0.9);
+}
+
+.paw:nth-child(3) {
+  transform: translateY(8px) rotate(0deg) scale(0.9);
+}
+
+.paw:nth-child(4) {
+  transform: translateY(-2px) rotate(3deg) scale(0.9);
+}
+
+.paw:nth-child(5) {
+  transform: translateY(12px) rotate(6deg) scale(0.9);
+}
+
+.paw.is-on {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg) scale(1);
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 1)) drop-shadow(0 0 32px rgba(255, 255, 255, 0.6));
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, .8)) drop-shadow(0 0 16px rgba(255, 255, 255, .5));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1)) drop-shadow(0 0 35px rgba(255, 255, 255, .7));
+  }
+}
+
+/* ========================= 영상 ========================= */
+.video-section {
+  min-height: 100vh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.video-wrap {
+  position: relative;
+  width: min(90%, 1280px);
+  aspect-ratio: 16/9;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 30px 120px rgba(0, 0, 0, .65);
+  border: 2px solid rgba(255, 255, 255, .3);
+}
+
+.video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 20px;
+}
+
+/* ========================= 푸터 ========================= */
+.site-footer {
+  background: #1a191a;
+  text-align: center;
+  padding: 28px 16px;
+  color: rgba(255, 255, 255, .7);
+}
+
+.footer-mark {
+  height: 22px;
+  filter: grayscale(1) brightness(.9);
+  margin-bottom: 8px;
+}
+
+.footer-text {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.footer-text small {
+  color: rgba(255, 255, 255, .5);
+  display: block;
+  margin-top: 4px;
+}
+
+/* 접근성 */
+@media (prefers-reduced-motion: reduce) {
+
+  .paw,
+  .lightwash {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* =========================================================
+   로그인 모달 (id="loginModal" 전용)
+   - main.ejs는 수정하지 않고 CSS만으로 정렬/간격/타이포를 다 잡아줌
+   ========================================================= */
 .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(6px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
 }
 
-.login-modal {
-    width: 430px;
-    background: #f8f8f8;
-    padding: 50px 34px 32px;
-    /* ★ 수정: 기존 42px → 50px (탭과 X버튼 간격 확보) */
-    border-radius: 18px;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+/* 모달 카드 */
+.modal {
+  position: relative;
+  width: min(92vw, 420px);
+  background: rgba(255, 255, 255, .97);
+  color: #111;
+  border-radius: 18px;
+  padding: 28px 24px 22px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .45);
+  animation: modalPop .28s ease-out;
 }
 
-/* X 버튼 */
-.login-close-btn {
-    position: absolute;
-    top: 12px;
-    /* ★ 수정: 기존 16px → 12px (조금 더 위로 올림) */
-    right: 16px;
-    font-size: 28px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #333;
-    padding: 8px 12px;
-    /* ★ padding 증가하여 밀착 느낌 제거 */
-    line-height: 1;
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* 탭 버튼 */
-.login-tabs {
-    display: flex;
-    gap: 8px;
-    margin-top: 18px;
-    /* ★ 추가: 닫기 버튼과 더 넓게 분리 */
-    margin-bottom: 24px;
-    /* ★ 기존 20px → 24px */
+/* 닫기 버튼 */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #444;
+  cursor: pointer;
+  transition: color .2s;
 }
 
+.close-btn:hover {
+  color: #000;
+}
+
+/* 제목/안내 */
+.modal h2 {
+  margin: 4px 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  color: #000;
+}
+
+.modal p {
+  margin: 10px 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  text-align: center;
+}
+
+/* 상단 탭 버튼(현재 HTML의 .tab-btn에 맞춘 스타일) */
 .tab-btn {
-    flex: 1;
-    padding: 12px 0;
-    background: #e4e4e4;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 15px;
-    color: #444;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 1px solid #ddd;
+  background: #f3f3f3;
+  color: #333;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, transform .05s;
 }
 
-.tab-btn.active {
-    background: #222;
-    color: #fff;
+.tab-btn:hover {
+  background: #fff;
 }
 
-/* 입력 필드 */
-.auth-pane label {
-    display: block;
-    margin-top: 14px;
-    font-size: 13px;
-    color: #444;
+.tab-btn:active {
+  transform: translateY(1px);
 }
 
-.auth-pane input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    margin-top: 6px;
-    font-size: 14px;
-    background: #fff;
+.tab-btn[data-tab="login"].is-active,
+.tab-btn[data-tab="signup"].is-active {
+  background: #fff;
+  box-shadow: 0 0 0 2px #000 inset;
+}
+
+/* 폼 전체: 세로 스택 고정 */
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 라벨/인풋: 줄 깨짐 방지 — 라벨을 항상 블록으로, 인풋은 100% 폭 */
+.modal label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  margin: 2px 0 6px;
+  line-height: 1.25;
+}
+
+.modal input {
+  display: block;
+  width: 100%;
+  padding: 12px 12px;
+  border: 1px solid #cfcfcf;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.modal input::placeholder {
+  color: #b3b3b3;
+}
+
+.modal input:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, .06);
 }
 
 /* 제출 버튼 */
-.login-submit-btn {
-    width: 100%;
-    margin-top: 22px;
-    padding: 14px;
-    background: #000;
-    color: #fff;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 15px;
+.submit-btn {
+  margin-top: 6px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform .08s, box-shadow .12s, background .15s;
 }
 
-/* 하단 */
-.login-bottom-text {
-    text-align: center;
-    color: #777;
-    margin-top: 12px;
-    font-size: 13px;
+.submit-btn:hover {
+  background: #222;
 }
 
-.login-bottom-text a {
-    color: #000;
-    font-weight: 600;
-    text-decoration: underline;
+.submit-btn:active {
+  transform: translateY(1px);
 }
 
-/* 에러 메시지 */
-.auth-error {
-    margin: 8px 0 10px;
-    color: #c62828;
-    font-size: 13px;
+/* 하단 링크 */
+.modal a {
+  color: #888;
+  text-decoration: underline;
+  font-weight: 700;
+  transition: color .15s;
 }
 
-
-.border-shadow {
-    border: 1px solid #eee;
-    box-shadow: 1px 3px 10px #ccc;
+.modal a:hover {
+  color: #000;
 }
 
-.text-center {
-    text-align: center;
+/* 반응형 — 작은 화면에서 패딩 최적화 */
+@media (max-width: 420px) {
+  .modal {
+    width: min(94vw, 420px);
+    padding: 24px 18px;
+  }
+
+  .submit-btn {
+    padding: 12px;
+  }
 }
 
-header {
-    width: 100%;
-
+/* ========================= FAB ========================= */
+.fab-login {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .35);
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font-weight: 600;
 }
 
-header nav {
-    width: 100%;
-    padding: 1em 0;
+.fab-form {
+  all: unset;
 }
 
-header nav a {
-    font-size: 1.5em;
-    font-weight: bold;
+.logout-btn {
+  border-color: rgba(255, 120, 120, .6);
+  color: #ffbbbb;
 }
 
-
-/* list */
-#site-main {
-    width: 800px;
-    margin: 6em auto 0;
+/* ========================= Glitz Zone ========================= */
+.glitz-chip-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 14px;
 }
 
-.button-box {
-    display: flex;
-    justify-content: flex-end;
+.glitz-chip {
+  background: #e9e9e9;
+  color: #222;
+  border-radius: 22px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .08);
+  border: 1px solid #d8d8d8;
 }
 
-.button-box>a {
-    font-size: 1em;
-    padding: .5em 1em;
+.glitz-chip .chip-nick {
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.button-box i {
-    margin-right: .5em;
+.glitz-chip .chip-sep {
+  margin: 0 4px;
+  opacity: .7;
 }
 
-#site-main .container form {
-    margin: 2em 0;
+.glitz-chip .chip-text {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 60vw;
 }
 
-td .btn {
-    color: #ccc;
+@media (min-width:1200px) {
+  .glitz-chip .chip-text {
+    max-width: 720px;
+  }
 }
 
-/* responsive table */
-@media only screen and (max-width: 800px) {
-
-    table,
-    thead,
-    tbody,
-    th,
-    td,
-    tr {
-        display: block;
-    }
-
-    thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    tr {
-        border: 1px solid #ddd;
-    }
-
-    td {
-        border: none;
-        border-bottom: 1px solid #ddd;
-        position: relative;
-    }
+.glitz-chip--empty {
+  background: #f1f1f1;
+  color: #666;
+  font-weight: 600;
 }
 
-
-/* add */
-#site-main h2 {
-    font-size: 1.6em;
-    margin-bottom: 1em;
-    text-align: center;
+/* 입력 박스 */
+.glitz-editor {
+  position: relative;
+  background: #e6e6e6;
+  border: 1px solid #d5d5d5;
+  color: #222;
+  border-radius: 14px;
+  padding: 18px 96px 18px 18px;
+  display: block;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .08);
 }
 
-#site-main p {
-    color: #aaa;
-    font-size: 1em;
-    margin: 1em auto 2em;
-    text-align: center;
+.glitz-editor textarea {
+  width: 100%;
+  min-height: 70px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-.user-info {
-    max-width: 620px;
-    margin: auto;
+.glitz-editor textarea::placeholder {
+  color: #9a9a9a;
 }
 
-.user-info input[type="text"] {
-    width: 100%;
-    padding: .6em 1em;
-    margin: .5em 0;
-    border: 1px solid #ddd;
-    font-size: 1em;
-    border-radius: .2em;
+/* 전송 버튼 */
+.glitz-send {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .18);
+  background: #fff;
+  color: #222;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .1);
+  transition: transform .1s ease, box-shadow .1s ease;
 }
 
-#site-main form button:not([class="login-btn"]) {
-    margin-top: 1em;
-    width: 100%;
-    padding: .5em 0;
-    background-color: #eee;
-    border: 1px solid #ddd;
-    transition: background-color .5s ease;
+.glitz-send:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, .14);
 }
 
-#site-main form button:hover {
-    background-color: #222;
-    color: #fff;
+.glitz-send:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .1);
 }
 
-
-/* Login Form */
-.login,
-.register {
-    width: 80%;
-    margin: 30px auto;
+/* === Glitz 목록 스크롤 컨테이너 ====================== */
+.glitz-list-wrap {
+  /* 화면 높이에 맞춰 유연하게: 너무 작지도, 너무 크지도 않게 */
+  max-height: clamp(320px, 52vh, 680px);
+  overflow-y: auto;
+  padding-right: 6px;
+  /* 스크롤바 공간 확보로 내용 들뜸 방지 */
+  margin-bottom: 18px;
+  /* 아래 입력 박스와 간격 */
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  outline: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.login label,
-.register label {
-    visibility: hidden;
+/* 스크롤바(웹킷) 미세 커스텀 – 은은하게 */
+.glitz-list-wrap::-webkit-scrollbar {
+  width: 10px;
 }
 
-.login input,
-.register input {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 25px;
-    font-size: 15px;
-    border: none;
-    outline: none;
-    border-bottom: 2px solid #eee;
+.glitz-list-wrap::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.login-btn,
-.register-btn {
-    border: none;
+.glitz-list-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
-hr {
-    border: none;
-    margin-top: 30px;
+.glitz-list-wrap:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.28);
 }
 
-.site-footer {
-    width: 100%;
-    background: #111;
-    /* 어두운 블랙톤 */
-    padding: 40px 0;
-    color: #f1f1f1;
-    font-family: "Pretendard", sans-serif;
-}
-
-.footer-inner {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 0 24px;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 60px;
-}
-
-.footer-left img.footer-mark {
-    width: 140px;
-    opacity: 0.95;
-}
-
-.footer-right {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.footer-info {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    line-height: 1.8;
-}
-
-.footer-info li {
-    font-size: 15px;
-    color: #e6e6e6;
-}
-
-.footer-info li span {
-    display: inline-block;
-    width: 90px;
-    font-weight: 600;
-    color: #bcbcbc;
-}
-
-.footer-copy {
-    margin-top: 10px;
-    font-size: 13px;
-    color: #bbbbbb;
-}
-
-/* ===== 반응형 ===== */
-@media (max-width: 768px) {
-    .footer-inner {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 30px;
-    }
-
-    .footer-left img.footer-mark {
-        width: 120px;
-    }
-
-    .footer-info li span {
-        width: 70px;
-    }
-}
-
-.site-header {
-    height: 80px !important;
-    padding: 0 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    z-index: 999 !important;
-    box-sizing: border-box !important;
-}
-
-/* 내부 요소들 크기 흔들림 방지 */
-.site-header * {
-    line-height: 1 !important;
-}
-
-/* ===== 메인 레이아웃 ===== */
-main.market-list {
-    padding: 120px 48px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-/* ===== 상품 등록 버튼 (캡슐 스타일) ===== */
-.add-btn {
-    display: inline-block;
-    padding: 10px 26px;
-    background: #000;
-    color: #fff;
-    border-radius: 100px;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: 0.25s ease;
-}
-
-.add-btn:hover {
-    background: #181818;
-    transform: translateY(-2px);
-}
-
-.section-title {
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 24px;
-    opacity: 0.8;
-}
-
-/* ===== 상품 목록 ===== */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-}
-
-.product-card {
-    cursor: pointer;
-}
-
-.product-thumb {
-    width: 100%;
-    aspect-ratio: 1/1;
-    background: #e9e9e9;
-    background-size: cover;
-    background-position: center;
-    border-radius: 4px;
-}
-
-.product-title {
-    margin-top: 14px;
-    font-size: 15px;
-    font-weight: 400;
-    opacity: 0.9;
-}
-
-.product-price {
-    margin-top: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0.8;
+/* 모바일에서 높이 조금 키우기 */
+@media (max-width: 600px) {
+  .glitz-list-wrap {
+    max-height: 58vh;
+  }
 }
