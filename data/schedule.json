@@ -1,0 +1,26 @@
+[{
+        "date": "2025-10-08",
+        "title": ["ILLIT 팬미팅"],
+        "type": ["pink"]
+    },
+    {
+        "date": "2025-10-08",
+        "title": ["ILLIT 팬미팅"],
+        "type": "pink"
+    },
+    {
+        "date": "2024-10-09",
+        "title": ["뮤직뱅크 출연"],
+        "type": ["purple"]
+    },
+    {
+        "date": "2025-10-12",
+        "title": ["쇼케이스","리허설"],
+        "type": ["pink", "green"]
+    },
+    {
+        "date": "2025-12-11",
+        "title": ["쇼케이스","리허설"],
+        "type": ["pink", "green"]
+    }
+]

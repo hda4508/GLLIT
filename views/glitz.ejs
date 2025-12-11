@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        html, body {
+            font-family: "Pretendard", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+        }
+
+        main {
+            padding: 120px 24px 48px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .glitz-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .glitz-head h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .glitz-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .glitz-controls a {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #ddd;
+        }
+
+        .glitz-controls a.active {
+            background: #fff;
+            color: #111;
+            border-color: #fff;
+        }
+
+        .glitz-list-wrap {
+            margin-bottom: 18px;
+        }
+
+        .glitz-chip-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .glitz-chip {
+            background: #111;
+            border: 1px solid #2a2a2a;
+            color: #ddd;
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chip-nick {
+            font-weight: 700;
+        }
+
+        .chip-sep {
+            opacity: .6;
+        }
+
+        .chip-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .chip-del button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, .18);
+            background: #fff;
+            color: #444;
+            cursor: pointer;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .chip-edit summary {
+            cursor: pointer;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .chip-edit form {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chip-edit input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+            background: #111;
+            color: #eee;
+        }
+
+        .chip-edit button {
+            padding: 8px 12px;
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #fff;
+            font-weight: 700;
+        }
+
+        .glitz-editor {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .glitz-editor textarea {
+            flex: 1;
+            min-height: 72px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+            background: #111;
+            color: #eee;
+        }
+
+        .glitz-send {
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: #fff;
+            color: #111;
+            border: 1px solid #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body data-is-login="true">
+
+    <%- include('partials/header') %>
+
+    <main>
+        <div class="glitz-head">
+            <h1>Glitz Zone</h1>
+            <div style="color:#aaa;font-size:14px">안녕하세요, <strong><%= user.nickname %></strong> 님</div>
+        </div>
+
+        <!-- 보기 필터 -->
+        <div class="glitz-controls">
+            <a href="/glitz" class="<%= !mine ? 'active' : '' %>">전체</a>
+            <a href="/glitz?mine=1" class="<%= mine ? 'active' : '' %>">내 글만</a>
+        </div>
+
+        <div class="glitz-list-wrap">
+            <ul class="glitz-chip-list">
+                <% posts.forEach(p => { 
+                    const isMine = user && p.authorId && (String(p.authorId) === String(user.id)); 
+                %>
+
+                <li class="glitz-chip">
+                    <span class="chip-nick"><%= p.authorNickname %></span>
+                    <span class="chip-sep"> : </span>
+                    <span class="chip-text"><%= p.content %></span>
+
+                    <% if (isMine) { %>
+                    <form class="chip-del" action="/glitz/delete/<%= p._id %>" method="post"
+                        onsubmit="return confirm('이 글을 삭제할까요?');">
+                        <button type="submit">×</button>
+                    </form>
+                    <% } %>
+
+                    <% if (mine && isMine) { %>
+                    <div class="chip-edit">
+                        <details>
+                            <summary>내용 수정</summary>
+                            <form action="/glitz/edit/<%= p._id %>" method="post">
+                                <input name="content" value="<%= p.content %>" />
+                                <button type="submit">저장</button>
+                            </form>
+                        </details>
+                    </div>
+                    <% } %>
+                </li>
+
+                <% }) %>
+
+                <% if (!posts.length) { %>
+                <li class="glitz-chip glitz-chip--empty">
+                    <%= mine ? "내 글이 아직 없어요. 첫 글을 남겨보세요! 😊"
+                           : "첫 글을 남겨보세요 😊" %>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+
+        <form class="glitz-editor" action="/glitz/post" method="post">
+            <textarea name="content" placeholder="이곳을 눌러 마음을 적어주세요!" required></textarea>
+            <button type="submit" class="glitz-send">Post</button>
+        </form>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>

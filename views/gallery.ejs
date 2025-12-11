@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        * {
+            font-family: "Pretendard", sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #111;
+            color: #fff;
+            overflow-x: hidden !important;
+        }
+
+        .gallery-wrap {
+            display: flex;
+            gap: 40px;
+            padding: 120px 40px;
+            width: 100%;
+        }
+
+        /* LEFT */
+        .left-photo {
+            width: 40%;
+            min-width: 320px;
+        }
+
+        .left-photo img {
+            width: 100%;
+            border-radius: 16px;
+            display: block;
+        }
+
+        /* RIGHT 영역 */
+        .right-box {
+            width: 55%;
+            min-width: 0;
+            height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px;
+        }
+
+        /* ★ Masonry 핵심 */
+        .right-photos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 8px;
+            gap: 18px;
+        }
+
+        .photo-block {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-block img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .add-btn {
+            margin: 20px 0;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Modal */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-box {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 320px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        .btn {
+            margin-top: 10px;
+            padding: 10px;
+            background: #444;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include("partials/header") %>
+
+    <div class="gallery-wrap">
+        <div class="left-photo">
+            <img src="/img/<%= member %>.jpg">
+            <h3 style="margin-top:20px;"><%= member.toUpperCase() %> gallery</h3>
+        </div>
+
+        <div class="right-box">
+            <div class="add-btn" onclick="openModal()">+ 사진 추가</div>
+
+            <div class="right-photos" id="gallery">
+
+                <% photos.forEach(photo => { %>
+                <div class="photo-block">
+                    <img src="<%= photo.imageUrl %>" class="masonry-img">
+
+                    <!-- ⭐ 본인이 올린 사진만 삭제 버튼 표시 -->
+                    <% if (user && String(photo.authorId) === String(user.id)) { %>
+                        <div class="delete-btn" onclick="deletePhoto('<%= photo._id %>')">삭제</div>
+                    <% } %>
+                </div>
+                <% }) %>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-bg" id="modal">
+        <div class="modal-box">
+            <h3>사진 URL 추가</h3>
+            <input id="photoURL" placeholder="이미지 URL 입력">
+
+            <div class="btn" onclick="submitPhoto()">추가</div>
+            <div class="btn" onclick="closeModal()">닫기</div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById("modal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        async function submitPhoto() {
+            const url = document.getElementById("photoURL").value.trim();
+            if (!url) return;
+
+            await fetch("/gallery/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    member: "<%= member %>",
+                    url
+                })
+            });
+
+            location.reload();
+        }
+
+        async function deletePhoto(id) {
+            if (!confirm("삭제할까요?")) return;
+
+            await fetch(`/gallery/delete/${id}`, {
+                method: "POST"
+            });
+            location.reload();
+        }
+
+        /* Masonry 계산 */
+        function resizeMasonryItem(item) {
+            const grid = document.getElementById('gallery');
+            const rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+            const rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('gap'));
+            const itemImg = item.querySelector('img');
+
+            const rowSpan = Math.ceil((itemImg.getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
+            item.style.gridRowEnd = "span " + rowSpan;
+        }
+
+        function resizeAllMasonryItems() {
+            const allItems = document.querySelectorAll('.photo-block');
+            allItems.forEach(item => resizeMasonryItem(item));
+        }
+
+        window.onload = () => {
+            resizeAllMasonryItems();
+            syncHeights();
+        };
+
+        window.onresize = () => {
+            resizeAllMasonryItems();
+            syncHeights();
+        };
+
+        document.querySelectorAll('.masonry-img').forEach(img => {
+            img.onload = () => resizeAllMasonryItems();
+        });
+
+        function syncHeights() {
+            const leftImg = document.querySelector(".left-photo img");
+            const rightBox = document.querySelector(".right-box");
+
+            if (leftImg && rightBox) {
+                rightBox.style.height = leftImg.clientHeight + "px";
+            }
+        }
+
+        document.querySelector(".left-photo img").onload = () => {
+            syncHeights();
+        };
+    </script>
+
+</body>
+
+</html>

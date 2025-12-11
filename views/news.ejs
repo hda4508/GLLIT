@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        html,
+        body {
+            font-family: "Pretendard", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #fff;
+            overflow-x: hidden;
+            /* ← 가로 스크롤 완전 제거 */
+        }
+
+        /* --------------------------
+           고정된 몽환적 고양이 장식
+        --------------------------- */
+        .cat-fixed {
+            position: fixed;
+            bottom: -40px;
+            left: 40px;
+            width: 380px;
+            opacity: 0.23;
+            pointer-events: none;
+            filter: drop-shadow(0 0 45px rgba(100, 140, 255, 0.55));
+            z-index: 1;
+        }
+
+        .cat-fixed-right {
+            position: fixed;
+            top: 120px;
+            right: 30px;
+            width: 330px;
+            opacity: 0.22;
+            pointer-events: none;
+            transform: scaleX(-1);
+            filter: drop-shadow(0 0 50px rgba(120, 160, 255, 0.45));
+            z-index: 1;
+        }
+
+        /* --------------------------
+           달력 전체 박스
+        --------------------------- */
+        main {
+            position: relative;
+            z-index: 5;
+        }
+
+        .calendar-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 55px 70px;
+            background: #1d1d1d;
+            border-radius: 38px;
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.45),
+                inset 0 0 80px rgba(0, 0, 0, 0.4);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .month-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: none;
+            border: 2px solid #666;
+            font-size: 20px;
+            cursor: pointer;
+            color: #fff;
+            transition: 0.2s;
+        }
+
+        .month-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 22px;
+            text-align: center;
+        }
+
+        .day-name {
+            font-weight: 600;
+            color: #bdbdbd;
+        }
+
+        .day {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .day-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .day:hover .day-number {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .today .day-number {
+            border: 2px solid #ff628f;
+        }
+
+        .day-number.sunday {
+            color: #ff7b7b;
+        }
+
+        .day-number.saturday {
+            color: #6bb3ff;
+        }
+
+        .dots {
+            display: flex;
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .event-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        /* --------------------------
+           모달
+        --------------------------- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: #fff;
+            color: #111;
+            padding: 30px;
+            width: 360px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            animation: modalPop 0.25s ease;
+        }
+
+        @keyframes modalPop {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #closeModal {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-size: 26px;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        #modalDate {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .event-item {
+            font-size: 17px;
+            margin: 6px 0;
+        }
+
+        .event-dot-small {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ✨ 몽환적 고양이 (좌우 고정) -->
+    <img src="/img/cat1.png" class="cat-fixed">
+    <img src="/img/cat1.png" class="cat-fixed-right">
+
+    <%- include('partials/header') %>
+
+    <main style="padding:120px 24px 100px;">
+
+        <div class="calendar-wrapper">
+            <div class="calendar-header">
+                <button class="month-btn" id="prevMonth">←</button>
+                <div id="monthTitle">2025 • 11월</div>
+                <button class="month-btn" id="nextMonth">→</button>
+            </div>
+
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+    </main>
+
+    <!-- 모달 -->
+    <div class="modal" id="dayModal">
+        <div class="modal-content">
+            <button id="closeModal">&times;</button>
+            <h2 id="modalDate"></h2>
+            <div id="modalEvents"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const grid = document.getElementById("calendarGrid");
+            const monthTitle = document.getElementById("monthTitle");
+
+            const prevBtn = document.getElementById("prevMonth");
+            const nextBtn = document.getElementById("nextMonth");
+
+            const modal = document.getElementById("dayModal");
+            const closeModal = document.getElementById("closeModal");
+            const modalDate = document.getElementById("modalDate");
+            const modalEvents = document.getElementById("modalEvents");
+
+            let current = new Date();
+            let events = {};
+
+            function loadSchedule() {
+                return fetch("/api/schedule")
+                    .then(res => res.json())
+                    .then(data => {
+                        events = {};
+                        data.forEach(item => {
+                            events[item.date] = {
+                                title: Array.isArray(item.title) ? item.title : [item.title],
+                                type: Array.isArray(item.type) ? item.type : [item.type]
+                            };
+                        });
+                        renderCalendar(current);
+                    });
+            }
+
+            function renderCalendar(date) {
+                grid.innerHTML = "";
+
+                const year = date.getFullYear();
+                const month = date.getMonth();
+
+                monthTitle.textContent = `${year} • ${month + 1}월`;
+
+                const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+                dayNames.forEach(name => {
+                    const div = document.createElement("div");
+                    div.className = "day-name";
+                    div.textContent = name;
+                    grid.appendChild(div);
+                });
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const lastDate = new Date(year, month + 1, 0).getDate();
+
+                for (let i = 0; i < firstDay; i++) {
+                    grid.appendChild(document.createElement("div"));
+                }
+
+                for (let d = 1; d <= lastDate; d++) {
+
+                    const fullDate = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+                    const cell = document.createElement("div");
+                    cell.className = "day";
+
+                    const num = document.createElement("div");
+                    num.className = "day-number";
+                    num.textContent = d;
+
+                    const weekDay = new Date(year, month, d).getDay();
+                    if (weekDay === 0) num.classList.add("sunday");
+                    if (weekDay === 6) num.classList.add("saturday");
+
+                    const today = new Date();
+                    if (
+                        today.getFullYear() === year &&
+                        today.getMonth() === month &&
+                        today.getDate() === d
+                    ) {
+                        cell.classList.add("today");
+                    }
+
+                    const dots = document.createElement("div");
+                    dots.className = "dots";
+
+                    if (events[fullDate]) {
+                        events[fullDate].type.forEach(color => {
+                            const dot = document.createElement("span");
+                            dot.className = "event-dot";
+                            dot.style.background = color;
+                            dots.appendChild(dot);
+                        });
+                    }
+
+                    cell.addEventListener("click", () => {
+                        modal.style.display = "flex";
+                        modalDate.textContent = fullDate;
+                        modalEvents.innerHTML = "";
+
+                        if (events[fullDate]) {
+                            events[fullDate].title.forEach((t, i) => {
+                                const wrap = document.createElement("div");
+                                wrap.className = "event-item";
+                                wrap.innerHTML = `
+                            <span class="event-dot-small" style="background:${events[fullDate].type[i]}"></span>
+                            ${t}
+                        `;
+                                modalEvents.appendChild(wrap);
+                            });
+                        } else {
+                            modalEvents.innerHTML = "일정이 없습니다.";
+                        }
+                    });
+
+                    cell.appendChild(num);
+                    cell.appendChild(dots);
+                    grid.appendChild(cell);
+                }
+            }
+
+            prevBtn.addEventListener("click", () => {
+                current.setMonth(current.getMonth() - 1);
+                renderCalendar(current);
+            });
+
+            nextBtn.addEventListener("click", () => {
+                current.setMonth(current.getMonth() + 1);
+                renderCalendar(current);
+            });
+
+            closeModal.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) modal.style.display = "none";
+            });
+
+            loadSchedule();
+        });
+    </script>
+    <%- include('partials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<% if (user) { %>
+<form action="/logout" method="post" class="fab-form" style="position:fixed;right:24px;bottom:24px;z-index:20;">
+    <button type="submit" class="fab-login">Logout</button>
+</form>
+<% } else { %>
+<button id="openLogin" type="button" class="fab-login" aria-label="Login"
+    style="position:fixed;right:24px;bottom:24px;z-index:20;">
+    Login
+</button>
+<% } %>

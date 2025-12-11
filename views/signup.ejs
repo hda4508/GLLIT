@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Noto Sans KR", sans-serif;
+        }
+
+        .signup-box {
+            background: rgba(255, 255, 255, .06);
+            backdrop-filter: blur(8px);
+            border-radius: 14px;
+            padding: 32px 28px;
+            width: 340px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, .5);
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0 0 18px;
+            font-family: "Playfair Display", serif;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin: 10px 0 6px;
+            color: #ddd;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #777;
+            background: #111;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 16px;
+            border: none;
+            border-radius: 8px;
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e6e6e6;
+        }
+
+        .error-message {
+            color: #ff7a7a;
+            text-align: center;
+            margin: 10px 0 0;
+            min-height: 18px;
+            font-size: 13px;
+        }
+
+        .back {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .back a {
+            color: #bbb;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup-box">
+        <h2>회원가입</h2>
+
+        <% if (errorMessage) { %>
+        <p class="error-message"><%= errorMessage %></p>
+        <% } %>
+
+        <form action="/signup" method="post">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="홍길동" required>
+
+            <label for="password">비밀번호 (6자 이상)</label>
+            <input type="password" id="password" name="password" minlength="6" required>
+
+            <label for="passwordConfirm">비밀번호 확인</label>
+            <input type="password" id="passwordConfirm" name="passwordConfirm" minlength="6" required>
+
+            <button type="submit">가입하기</button>
+        </form>
+
+        <p class="back">이미 계정이 있으신가요? <a href="/">로그인</a></p>
+    </div>
+</body>
+
+</html>

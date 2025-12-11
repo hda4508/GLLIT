@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        html,
+        body {
+            font-family: "Pretendard", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+        }
+
+        /* ===== 메인 레이아웃 ===== */
+        main.market-list {
+            padding: 120px 48px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== 상품 등록 버튼 (캡슐 스타일) ===== */
+        .add-btn {
+            display: inline-block;
+            padding: 10px 26px;
+            background: #000;
+            color: #fff;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: 0.25s ease;
+        }
+
+        .add-btn:hover {
+            background: #181818;
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+
+        /* ===== 상품 목록 ===== */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+
+        .product-card {
+            cursor: pointer;
+        }
+
+        .product-thumb {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #e9e9e9;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+        }
+
+        .product-title {
+            margin-top: 14px;
+            font-size: 15px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .product-price {
+            margin-top: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        /* ===== 작성자 닉네임 ===== */
+        .product-author {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #bbb;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+    <main class="market-list">
+
+        <!-- 상품 등록 버튼 -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 28px;">
+            <a href="/albums/new" class="add-btn">상품 등록</a>
+        </div>
+
+        <h2 class="section-title">GLLIT SHOP</h2>
+
+        <div class="product-grid">
+            <% items.forEach(item => { %>
+            <div class="product-card" onclick="location.href='/albums/<%= item._id %>'">
+
+                <div class="product-thumb" <% if (item.image) { %> style="background-image: url('<%= item.image %>');"
+                    <% } %>>
+                </div>
+
+                <!-- 상품 제목 -->
+                <div class="product-title">
+                    <%= item.title || "상품 이름 없음" %>
+                </div>
+
+                <!-- 가격 -->
+                <div class="product-price">
+                    <%= item.price ? item.price.toLocaleString() + "원" : "가격 미정" %>
+                </div>
+
+                <!-- ⭐ 작성자 닉네임 표시 (닉네임 변경 시 자동 반영됨) -->
+                <div class="product-author">
+                    작성자: <%= item.authorNickname %>
+                </div>
+
+            </div>
+            <% }) %>
+        </div>
+
+    </main>
+    <%- include('partials/footer') %>
+</body>
+
+</html>

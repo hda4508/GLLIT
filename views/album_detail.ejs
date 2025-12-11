@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+        }
+
+        main.detail-page {
+            max-width: 1350px;
+            margin: 120px auto;
+            padding: 50px;
+            display: flex;
+            gap: 60px;
+        }
+
+        .detail-image {
+            flex: 1;
+            min-height: 650px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .detail-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .detail-price {
+            font-size: 26px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .meta-box {
+            padding: 18px 0;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .meta-text {
+            font-size: 16px;
+        }
+
+        .detail-desc {
+            padding: 22px 0;
+            color: rgba(255,255,255,0.85);
+            min-height: 120px;
+        }
+
+        .button-row {
+            margin-top: 30px;
+            display: flex;
+            gap: 14px;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 12px 24px;
+            font-size: 15px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #fff;
+            transition: 0.25s;
+        }
+
+        button:hover {
+            border-color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .delete-btn {
+            border-color: rgba(255,50,50,0.4);
+        }
+
+        .delete-btn:hover {
+            border-color: rgba(255,80,80,0.9);
+            background: rgba(255,30,30,0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+    <main class="detail-page">
+
+        <!-- 이미지 -->
+        <div class="detail-image"
+            <% if (item.image) { %>
+                style="background-image: url('<%= item.image %>');"
+            <% } %> >
+        </div>
+
+        <!-- 상품 정보 -->
+        <div class="detail-info">
+
+            <div class="detail-title"><%= item.title %></div>
+
+            <div class="detail-price">
+                <%= item.price ? item.price.toLocaleString() + '원' : '가격 미정' %>
+            </div>
+
+            <div class="meta-box">
+                <p class="meta-text">지역 : <%= item.location || '정보 없음' %></p>
+                <p class="meta-text">등록일 : <%= item.createdAt.toLocaleDateString() %></p>
+                <p class="meta-text">작성자 : <%= item.authorNickname %></p>
+            </div>
+
+            <div class="detail-desc">
+                <%= item.description || '등록된 설명이 없습니다.' %>
+            </div>
+
+            <!-- 🔥 본인 글만 수정/삭제 가능 -->
+            <% const isMine = (String(item.authorId) === String(user.id)); %>
+
+            <% if (isMine) { %>
+            <div class="button-row">
+
+                <button onclick="location.href='/albums/edit/<%= item._id %>'">
+                    상품 수정
+                </button>
+
+                <form action="/albums/<%= item._id %>/delete" method="post" style="display:inline;">
+                    <button class="delete-btn">상품 삭제</button>
+                </form>
+
+            </div>
+            <% } %>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>상품 등록</title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+        }
+
+        main.new-page {
+            max-width: 1350px;
+            margin: 120px auto;
+            padding: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            display: flex;
+            gap: 60px;
+            background: transparent;
+        }
+
+        /* 왼쪽 이미지 미리보기 */
+        .preview-box {
+            flex: 1;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            min-height: 520px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: 0.25s;
+        }
+
+        /* 오른쪽 입력 */
+        .right-fields {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 16px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: none;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .submit-btn {
+            margin-top: 10px;
+            padding: 16px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #fff;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .submit-btn:hover {
+            border-color: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+    </style>
+
+    <script>
+        // 이미지 URL 입력 시 미리보기 변경
+        function updatePreview(url) {
+            const box = document.getElementById("previewBox");
+            if (!url.trim()) {
+                box.style.backgroundImage = "";
+            } else {
+                box.style.backgroundImage = `url('${url}')`;
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+    <main class="new-page">
+
+        <!-- 왼쪽: 이미지 미리보기 -->
+        <div id="previewBox" class="preview-box"></div>
+
+        <!-- 오른쪽: 상품 정보 입력 -->
+        <form action="/albums/new" method="post" class="right-fields">
+
+            <div class="title">상품 등록</div>
+
+            <input type="text" name="title" placeholder="예: 아이폰 14 프로 128GB" required>
+
+            <input type="number" name="price" placeholder="예: 750000">
+
+            <input type="text" name="location" placeholder="예: 서울 강남구">
+
+            <textarea name="description" placeholder="상품 상태, 구성품, 사용감 등을 입력하세요"></textarea>
+
+            <input type="text" name="image" placeholder="이미지 URL 입력" oninput="updatePreview(this.value)" />
+
+            <button type="submit" class="submit-btn">상품 등록하기</button>
+        </form>
+
+    </main>
+
+</body>
+
+</html>

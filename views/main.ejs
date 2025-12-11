@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Noto+Sans+KR:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        html, body {
+            font-family: "Pretendard", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+        }
+
+        /* ========================= 모달 전체 스타일 ========================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .login-modal {
+            width: 430px;
+            background: #f8f8f8;
+            padding: 50px 34px 32px; /* ★ 수정: 기존 42px → 50px (탭과 X버튼 간격 확보) */
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        /* X 버튼 */
+        .login-close-btn {
+            position: absolute;
+            top: 12px;   /* ★ 수정: 기존 16px → 12px (조금 더 위로 올림) */
+            right: 16px;
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #333;
+            padding: 8px 12px; /* ★ padding 증가하여 밀착 느낌 제거 */
+            line-height: 1;
+        }
+
+        /* 탭 버튼 */
+        .login-tabs {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px;  /* ★ 추가: 닫기 버튼과 더 넓게 분리 */
+            margin-bottom: 24px; /* ★ 기존 20px → 24px */
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 0;
+            background: #e4e4e4;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .tab-btn.active {
+            background: #222;
+            color: #fff;
+        }
+
+        /* 입력 필드 */
+        .auth-pane label {
+            display: block;
+            margin-top: 14px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .auth-pane input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            margin-top: 6px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        /* 제출 버튼 */
+        .login-submit-btn {
+            width: 100%;
+            margin-top: 22px;
+            padding: 14px;
+            background: #000;
+            color: #fff;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        /* 하단 */
+        .login-bottom-text {
+            text-align: center;
+            color: #777;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        .login-bottom-text a {
+            color: #000;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* 에러 메시지 */
+        .auth-error {
+            margin: 8px 0 10px;
+            color: #c62828;
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+<body 
+    data-is-login="<%= user ? 'true' : 'false' %>"
+    data-need-login="<%= needLogin ? 'true' : 'false' %>"
+    data-next="<%= nextFromQuery || '' %>">
+
+    <%- include('partials/header') %>
+    <%- include('partials/fab') %>
+
+    <!-- ========================= 로그인/회원가입 모달 ========================= -->
+    <div class="modal-overlay" id="loginModal" style="display:none">
+        <div class="login-modal">
+
+            <button class="login-close-btn" id="closeModal" aria-label="닫기">&times;</button>
+
+            <% if (!user) { %>
+
+            <div class="login-tabs">
+                <button type="button" class="tab-btn active" data-tab="login">로그인</button>
+                <button type="button" class="tab-btn" data-tab="signup">회원가입</button>
+            </div>
+
+            <% if (errorMessage) { %>
+                <p id="authError" class="auth-error"><%= errorMessage %></p>
+            <% } else { %>
+                <p id="authError" class="auth-error" style="display:none;"></p>
+            <% } %>
+
+            <!-- 로그인 -->
+            <form id="loginForm" class="auth-pane" data-pane="login" action="/login" method="post">
+                <input type="hidden" name="next" id="nextPath" value="" />
+
+                <label>아이디</label>
+                <input type="text" name="username" placeholder="아이디" required>
+
+                <label>비밀번호</label>
+                <input type="password" name="password" placeholder="비밀번호" required minlength="6">
+
+                <button type="submit" class="login-submit-btn">로그인</button>
+
+                <p class="login-bottom-text">
+                    계정이 없으신가요?
+                    <a href="#" id="goSignup">회원가입</a>
+                </p>
+            </form>
+
+            <!-- 회원가입 -->
+            <form id="signupForm" class="auth-pane" data-pane="signup" action="/signup" method="post" style="display:none">
+
+                <label>아이디</label>
+                <input type="text" name="username" placeholder="원하는 아이디" required>
+
+                <label>닉네임 (글릿존에서 사용)</label>
+                <input type="text" name="nickname" placeholder="표시할 닉네임" required>
+
+                <label>이메일 (선택)</label>
+                <input type="email" name="email" placeholder="you@example.com">
+
+                <label>비밀번호</label>
+                <input type="password" name="password" minlength="6" placeholder="비밀번호 (6자 이상)" required>
+
+                <label>비밀번호 확인</label>
+                <input type="password" name="passwordConfirm" minlength="6" placeholder="비밀번호 확인" required>
+
+                <button type="submit" class="login-submit-btn">가입하기</button>
+
+                <p class="login-bottom-text">
+                    이미 계정이 있으신가요?
+                    <a href="#" id="goLogin">로그인</a>
+                </p>
+            </form>
+
+            <% } else { %>
+                <p style="color:#444;">이미 로그인되어 있습니다.</p>
+            <% } %>
+
+        </div>
+    </div>
+
+    <!-- ========================= 발자국 심볼 ========================= -->
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+        <defs>
+            <symbol id="paw-icon" viewBox="0 0 64 64">
+                <circle cx="18" cy="16" r="6" />
+                <circle cx="32" cy="12" r="6" />
+                <circle cx="46" cy="16" r="6" />
+                <ellipse cx="32" cy="38" rx="14" ry="10" />
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- ========================= 히어로 ========================= -->
+    <section class="hero" id="hero">
+        <div class="hero-inner">
+            <h1 class="logotype"><img src="/img/maintype.png" alt="ILLIT 로고"></h1>
+            <p class="subtitle"><%= subtitle %></p>
+        </div>
+
+        <div class="paw-trail">
+            <% for (let i = 0; i < 5; i++) { %>
+                <div class="paw"><svg><use href="#paw-icon"></use></svg></div>
+            <% } %>
+        </div>
+
+        <div class="lightwash"></div>
+    </section>
+
+    <!-- ========================= 영상 ========================= -->
+    <section class="video-section">
+        <div class="video-wrap">
+            <iframe src="https://www.youtube.com/embed/sPO4ImrS0b8?si=vnGwpS_iSJhvxkV7"
+                allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <!-- ========================= 푸터 ========================= -->
+    <%- include('partials/footer') %>
+
+    <script src="/script/script.js"></script>
+</body>
+
+</html>

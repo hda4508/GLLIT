@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+        }
+
+        main.edit-page {
+            max-width: 1350px;
+            margin: 120px auto;
+            padding: 40px;
+            display: flex;
+            gap: 60px;
+        }
+
+        .edit-image-box {
+            flex: 1;
+            min-height: 600px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 14px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .edit-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        label {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            border-color: rgba(255,255,255,0.65);
+            outline: none;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            padding: 14px 0;
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .submit-btn:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.7);
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+    <main class="edit-page">
+
+        <div class="edit-image-box"
+            <% if (item.image) { %>
+                style="background-image:url('<%= item.image %>');"
+            <% } %>>
+        </div>
+
+        <form class="edit-form" action="/albums/edit/<%= item._id %>" method="post">
+
+            <div>
+                <label>상품명</label>
+                <input type="text" name="title" value="<%= item.title %>" required>
+            </div>
+
+            <div>
+                <label>가격</label>
+                <input type="number" name="price" value="<%= item.price || '' %>">
+            </div>
+
+            <div>
+                <label>지역</label>
+                <input type="text" name="location" value="<%= item.location %>">
+            </div>
+
+            <div>
+                <label>이미지 URL</label>
+                <input type="text" name="image" value="<%= item.image %>">
+            </div>
+
+            <div>
+                <label>상품 설명</label>
+                <textarea name="description"><%= item.description || '' %></textarea>
+            </div>
+
+            <button class="submit-btn">상품 수정 완료</button>
+        </form>
+
+    </main>
+
+</body>
+</html>

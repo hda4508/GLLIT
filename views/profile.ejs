@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <style>
+        /* ===== 기본 ===== */
+        html,
+        body {
+            font-family: "Pretendard", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+            overflow-x: hidden; /* 가로 스크롤 방지 */
+        }
+
+        /* ===== 메인 래퍼 ===== */
+        main.profile-main {
+            position: relative; /* 고양이 배경을 main 안에서만 보이게 하기 위함 */
+            padding: 120px 24px 80px;
+            background: #111;
+            box-sizing: border-box;
+            overflow: hidden; /* 푸터로 이미지가 넘어가는 것 방지 */
+        }
+
+        .profile-shell {
+            max-width: 1150px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 5; /* 고양이보다 위 */
+        }
+
+        /* ===== 고양이 배경 이미지 ===== */
+        .bg-cat-wrap {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden; /* 이미지가 main 영역 밖으로 보이지 않도록 */
+            z-index: 1;
+        }
+
+        .bg-cat-left,
+        .bg-cat-right {
+            position: absolute;
+            opacity: 0.18;
+            filter: drop-shadow(0 0 55px rgba(120,150,255,0.55));
+            user-select: none;
+        }
+
+        .bg-cat-left {
+            bottom: -50px;
+            left: -20px;
+            width: 480px;
+        }
+
+        .bg-cat-right {
+            top: 120px;
+            right: -40px;
+            width: 420px;
+            transform: scaleX(-1);
+        }
+
+        /* ===== 카드 공통 ===== */
+        .card {
+            border-radius: 22px;
+            padding: 26px 30px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+            color: #E9F3FF;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(6px);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-desc {
+            color: #C9D9EE;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* ===== 히어로 카드 ===== */
+        .profile-hero {
+            border-radius: 22px;
+            padding: 28px 30px 24px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(170, 207, 255, 0.14);
+            background: rgba(25, 25, 25, 0.75);
+            backdrop-filter: blur(6px);
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .hero-logo-mark {
+            font-size: 24px;
+            letter-spacing: 0.22em;
+            font-weight: 900;
+        }
+
+        .hero-text {
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .hero-text strong {
+            font-size: 18px;
+            color: #E9F3FF;
+        }
+
+        .hero-meta {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        /* ===== 멤버 ===== */
+        .member-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .member-pill {
+            border: 1px solid #314056;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+        }
+
+        /* ===== 비주얼 이미지 ===== */
+        .profile-visual {
+            margin-top: 24px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, .5);
+        }
+
+        .profile-visual img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* ===== 정보 GRID ===== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 20px;
+        }
+
+        .info-item {
+            border: 1px solid #2E3A4E;
+            border-radius: 14px;
+            padding: 12px 16px;
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #E9F3FF;
+            margin-top: 3px;
+        }
+
+        /* ===== 세계관 리스트 ===== */
+        .concept-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .concept-item {
+            border: 1px solid #2E3A4E;
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .concept-item strong {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* ===== 수상 ===== */
+        .award-year {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            margin-bottom: 8px;
+        }
+
+        .award-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .award-item {
+            padding: 10px 0 10px 14px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .award-item::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            left: -6px;
+            top: 15px;
+        }
+
+        /* ===== 반응형 ===== */
+        @media (max-width: 850px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+    <main class="profile-main">
+
+        <!-- 고양이 배경 (푸터에는 절대 안 나옴) -->
+        <div class="bg-cat-wrap">
+            <img src="/img/cat2.png" class="bg-cat-left">
+            <img src="/img/cat2.png" class="bg-cat-right">
+        </div>
+
+        <div class="profile-shell">
+
+            <!-- 히어로 카드 -->
+            <section class="profile-hero">
+                <div class="hero-top">
+                    <div class="hero-brand">
+                        <div class="hero-logo-mark">ILLIT</div>
+                        <div class="hero-text">
+                            <strong>ILLIT</strong>
+                            <span>아일릿</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-meta">
+                        <div>빌리프랩 (BELIFT LAB)</div>
+                        <div>5인조 걸그룹</div>
+                    </div>
+                </div>
+
+                <div class="member-line">
+                    <span class="member-pill">윤아</span>
+                    <span class="member-pill">민주</span>
+                    <span class="member-pill">모카</span>
+                    <span class="member-pill">원희</span>
+                    <span class="member-pill">이로하</span>
+                </div>
+            </section>
+
+            <!-- 이미지 -->
+            <section class="profile-visual">
+                <img src="/img/illit.jpg" alt="ILLIT 그룹 이미지" />
+            </section>
+
+            <!-- 상세 정보 -->
+            <section class="profile-content">
+
+                <!-- 기본 정보 -->
+                <div class="card">
+                    <h3 class="section-title">그룹 기본 정보</h3>
+                    <p class="section-desc">
+                        아일릿(ILLIT)은 JTBC의 아이돌 오디션 프로그램 &lt;알유넥스트?&gt;를 통해 결성된 5인조 걸그룹으로,
+                        팀명은 ‘I Will’과 ‘It’을 합쳐 “무엇이든 될 수 있고, 무엇이 될지 기대되는 존재”라는 의미를 담고 있다.
+                    </p>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">결성일</span>
+                            <span class="info-value">2023년 9월 1일</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">데뷔일</span>
+                            <span class="info-value">2024년 3월 25일</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">소속사</span>
+                            <span class="info-value">빌리프랩 (BELIFT LAB)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">팬덤</span>
+                            <span class="info-value">GLLIT (글릿)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">응원봉</span>
+                            <span class="info-value">글릿봉</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 세계관 -->
+                <div class="card">
+                    <h3 class="section-title">세계관 &amp; 콘셉트</h3>
+
+                    <ul class="concept-list">
+                        <li class="concept-item">
+                            <strong>SUPER ME</strong>
+                            현실을 초월한 상상, 엉뚱함, 마법소녀 같은 ‘초월적 자아’를 담은 버전.
+                        </li>
+
+                        <li class="concept-item">
+                            <strong>REAL ME</strong>
+                            있는 그대로의 소녀의 현실적 모습과 감정, 솔직함을 담은 버전.
+                        </li>
+
+                        <li class="concept-item">
+                            <strong>비주얼 무드</strong>
+                            Dreamcore, Fairycore 기반의 몽환·판타지 감성 + 파스텔톤 색감.
+                        </li>
+
+                        <li class="concept-item">
+                            <strong>음악 스타일</strong>
+                            아르페지오 신스·칩튠·플럭앤비·하우스를 결합한 하이브리드 사운드.
+                        </li>
+
+                        <li class="concept-item">
+                            <strong>패션</strong>
+                            REAL ME의 일상 스타일부터 SUPER ME의 마법소녀 의상까지 폭넓게 표현.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 수상 -->
+                <div class="card">
+                    <h3 class="section-title">수상 경력</h3>
+
+                    <div class="award-block">
+                        <div class="award-year">2024</div>
+                        <ul class="award-list">
+                            <li class="award-item"><span class="award-date">11.21</span>MAMA – 여자 신인상</li>
+                            <li class="award-item"><span class="award-date">11.21</span>일본 레코드 대상 – 여자 신인상</li>
+                            <li class="award-item"><span class="award-date">11.30</span>MMA – 올해의 신인상</li>
+                            <li class="award-item"><span class="award-date">12.04</span>라인 뮤직 – 트렌드 어워즈</li>
+                        </ul>
+                    </div>
+
+                    <div class="award-block">
+                        <div class="award-year">2025</div>
+                        <ul class="award-list">
+                            <li class="award-item"><span class="award-date">01.05</span>골든디스크 – 신인상 / 본상</li>
+                            <li class="award-item"><span class="award-date">01.07</span>QQ 뮤직 – 올해의 한국 노래상</li>
+                            <li class="award-item"><span class="award-date">01.12</span>Korean Sales Music Awards – Best Debut Song</li>
+                            <li class="award-item"><span class="award-date">01.12</span>Tencent Music Awards – 올해의 K-POP EP 외 다수</li>
+                            <li class="award-item"><span class="award-date">01.24</span>스튜디오 춤 – 베스트 퍼포먼스</li>
+                            <li class="award-item"><span class="award-date">02.16</span>한터뮤직어워즈 – Rookie of the Year</li>
+                            <li class="award-item"><span class="award-date">02.22</span>The Awards – 베스트 코레오그래피 외</li>
+                            <li class="award-item"><span class="award-date">03.12</span>일본 골드디스크 – 올해의 노래상</li>
+                            <li class="award-item"><span class="award-date">03.18</span>iHeartAwards – 최우수 신인상</li>
+                            <li class="award-item"><span class="award-date">08.21</span>K-World Dream Awards – 본상 / MV상</li>
+                            <li class="award-item"><span class="award-date">11.28</span>MAMA – FANS' CHOICE TOP 10</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <%- include('partials/footer') %>
+
+</body>
+
+</html>

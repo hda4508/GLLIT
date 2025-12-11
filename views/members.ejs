@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= siteTitle %></title>
+    <link rel="stylesheet" href="/style/style.css" />
+
+    <!-- Pretendard 전체 적용 -->
+    <style>
+        * {
+            font-family: "Pretendard", sans-serif !important;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #f5f5f5;
+        }
+
+        /* ===== 메인 래퍼 ===== */
+        main.members-main {
+            padding: 120px 24px 80px;
+            background: #111;
+            box-sizing: border-box;
+        }
+
+        .members-shell {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        /* ===== 상단 타이틀 ===== */
+        .members-header {
+            margin-bottom: 40px;
+        }
+
+        .members-kor {
+            font-size: 13px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #a0a0a0;
+            margin-bottom: 6px;
+        }
+
+        .members-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .members-desc {
+            font-size: 14px;
+            color: #c1c6d4;
+            line-height: 1.7;
+        }
+
+        /* ===== 멤버 카드 ===== */
+        .members-grid {
+            margin-top: 36px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 26px;
+        }
+
+        .member-card {
+            flex: 1 1 0;
+            max-width: 190px;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .member-photo {
+            width: 190px;
+            height: 230px;
+            border-radius: 10px;
+            background: #000;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .member-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .member-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .member-birth {
+            font-size: 13px;
+            color: #dddddd;
+            margin-bottom: 2px;
+        }
+
+        .member-age {
+            font-size: 13px;
+            color: #9fa5b5;
+        }
+
+        /* ===== 반응형 ===== */
+        @media (max-width: 960px) {
+            .members-grid {
+                justify-content: center;
+            }
+
+            .member-card {
+                max-width: 160px;
+            }
+
+            .member-photo {
+                width: 160px;
+                height: 205px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            main.members-main {
+                padding: 100px 20px 60px;
+            }
+
+            .members-grid {
+                gap: 22px;
+            }
+
+            .member-card {
+                max-width: 45%;
+            }
+
+            .member-photo {
+                width: 100%;
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .member-card {
+                max-width: 100%;
+            }
+
+            .members-grid {
+                justify-content: flex-start;
+            }
+        }
+
+        /* ===== 조합표 섹션 ===== */
+        .combo-section {
+            margin-top: 70px;
+            padding: 40px 32px;
+            border-radius: 22px;
+            background: #151515;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .combo-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .combo-table-wrap {
+            overflow-x: auto;
+        }
+
+        .combo-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        .combo-table th,
+        .combo-table td {
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .combo-table thead th {
+            background: #1d1d1d;
+            color: #ddd;
+            font-weight: 600;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .combo-table tbody td {
+            color: #e6e6e6;
+            border-bottom: 1px solid #222;
+        }
+
+        .combo-table tbody th {
+            background: #1b1b1b;
+            color: #ccc;
+            font-weight: 600;
+            border-right: 1px solid #2b2b2b;
+        }
+
+        /* ===== 조합명 ===== */
+        .trio-section {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .trio-title {
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .trio-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px 28px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .trio-item {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+    <%- include('partials/fab') %>
+
+    <main class="members-main">
+        <div class="members-shell">
+
+            <!-- 상단 설명 -->
+            <header class="members-header">
+                <div class="members-kor">ILLIT · MEMBERS</div>
+                <h1 class="members-title">ILLIT 멤버 소개</h1>
+                <p class="members-desc">
+                    아일릿을 이루는 다섯 멤버의 기본 정보를 한눈에 볼 수 있는 페이지입니다.
+                    각 멤버의 이름과 생년월일, 나이를 정리해 글릿이 쉽게 확인할 수 있도록 구성했습니다.
+                </p>
+            </header>
+
+            <section class="members-grid">
+                <article class="member-card" onclick="location.href='/gallery/yunah'">
+                    <div class="member-photo"><img src="/img/YUNAH.jpg"></div>
+                    <div class="member-name">윤아</div>
+                </article>
+
+                <article class="member-card" onclick="location.href='/gallery/minju'">
+                    <div class="member-photo"><img src="/img/MINJU.jpg"></div>
+                    <div class="member-name">민주</div>
+                </article>
+
+                <article class="member-card" onclick="location.href='/gallery/moka'">
+                    <div class="member-photo"><img src="/img/MOKA.jpg"></div>
+                    <div class="member-name">모카</div>
+                </article>
+
+                <article class="member-card" onclick="location.href='/gallery/wonhee'">
+                    <div class="member-photo"><img src="/img/WONHEE.jpg"></div>
+                    <div class="member-name">원희</div>
+                </article>
+
+                <article class="member-card" onclick="location.href='/gallery/iroha'">
+                    <div class="member-photo"><img src="/img/IROHA.jpg"></div>
+                    <div class="member-name">이로하</div>
+                </article>
+            </section>
+
+        </div>
+
+        <!-- 조합표 -->
+        <section class="combo-section">
+
+            <h3 class="combo-title">멤버 조합표</h3>
+
+            <div class="combo-table-wrap">
+                <table class="combo-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>윤아</th>
+                            <th>민주</th>
+                            <th>모카</th>
+                            <th>원희</th>
+                            <th>이로하</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <th>윤아</th>
+                            <td>🐯</td>
+                            <td>치토스</td>
+                            <td>아가즈</td>
+                            <td>히치즈</td>
+                            <td>츄로스</td>
+                        </tr>
+                        <tr>
+                            <th>민주</th>
+                            <td>치토스</td>
+                            <td>🐰</td>
+                            <td>미모즈</td>
+                            <td>마희쭈</td>
+                            <td>슈크림즈</td>
+                        </tr>
+                        <tr>
+                            <th>모카</th>
+                            <td>아가즈</td>
+                            <td>미모즈</td>
+                            <td>🐹</td>
+                            <td>모희또즈</td>
+                            <td>모카룽</td>
+                        </tr>
+                        <tr>
+                            <th>원희</th>
+                            <td>히치즈</td>
+                            <td>마희쭈</td>
+                            <td>모희또즈</td>
+                            <td>🐶</td>
+                            <td>희어로즈</td>
+                        </tr>
+                        <tr>
+                            <th>이로하</th>
+                            <td>츄로스</td>
+                            <td>슈크림즈</td>
+                            <td>모카룽</td>
+                            <td>희어로즈</td>
+                            <td>🐱</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 조합명 -->
+            <section class="trio-section">
+                <h4 class="trio-title">3인 조합명</h4>
+
+                <div class="trio-list">
+                    <div class="trio-item">04즈, 언니즈 = 윤아 + 민주 + 모카</div>
+                    <div class="trio-item">호박아즈 = 윤아 + 민주 + 이로하</div>
+                    <div class="trio-item">부울후즈, 햄치치 = 윤아 + 모카 + 원희</div>
+                    <div class="trio-item">동그라미즈 = 민주 + 모카 + 원희</div>
+                    <div class="trio-item">초식즈 = 민주 + 모카 + 이로하</div>
+                    <div class="trio-item">콩자반즈 = 민주 + 원희 + 이로하</div>
+                    <div class="trio-item">이모이즈, 고구마즈, 잇프피즈 = 모카 + 원희 + 이로하</div>
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+    <%- include('partials/footer') %>
+
+</body>
+
+</html>
