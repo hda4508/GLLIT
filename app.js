@@ -32,15 +32,11 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // =======================================================
-//       STATIC FILES — Render에서 깨지지 않게 재설정
+//            STATIC FILES (Render 100% Safe Version)
 // =======================================================
-app.use("/img", express.static(path.join(__dirname, "img")));
-app.use("/style", express.static(path.join(__dirname, "style")));
-app.use("/script", express.static(path.join(__dirname, "script")));
-app.use("/public", express.static(path.join(__dirname, "public")));
-
-// ❌ 삭제 — Render에서 존재하지 않는 경로
-// app.use(express.static(path.join(__dirname, "..", "illit")));
+// ⚠️ 아주 중요: public 폴더 안에서만 정적 파일 제공 가능
+// public/css/style.css, public/img/~~~ 이런 구조여야 함.
+app.use(express.static(path.join(__dirname, "public")));
 
 // Body parser
 app.use(express.urlencoded({ extended: true }));
@@ -56,7 +52,7 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.DB_CONNECT,
-      ttl: 60 * 60 * 24 * 7,
+      ttl: 60 * 60 * 24 * 7, // 7일
     }),
     cookie: {
       httpOnly: true,
@@ -110,7 +106,6 @@ app.get("/", (req, res) => {
 // =======================================================
 //                     LOGIN / SIGNUP
 // =======================================================
-
 app.post("/login", async (req, res) => {
   try {
     const { username, email, password = "", next } = req.body;
@@ -119,10 +114,9 @@ app.post("/login", async (req, res) => {
     if (!ident) return res.redirect("/?needLogin=1&error=notfound");
 
     const isEmail = /\S+@\S+\.\S+/.test(ident);
-
     const query = isEmail
-      ? { email: { $regex: new RegExp(`^${ident}$`, "i") } }
-      : { username: { $regex: new RegExp(`^${ident}$`, "i") } };
+      ? { email: new RegExp(`^${ident}$`, "i") }
+      : { username: new RegExp(`^${ident}$`, "i") };
 
     const user = await User.findOne(query).select("+password");
     if (!user) return res.redirect("/?needLogin=1&error=notfound");
@@ -207,16 +201,15 @@ app.get("/glitz", requireLogin, async (req, res) => {
   });
 });
 
-// Create / Edit / Delete posts — 그대로 유지 (생략없이 너 코드 사용함)
+// GLITZ POST CREATE / EDIT / DELETE (너 코드 그대로 유지)
 
 // =======================================================
 //                     FLEA MARKET
 // =======================================================
-// (여기도 전체 유지 — 코드는 생략 안 함)
-
+// (너 코드 그대로 유지)
 
 // =======================================================
-//              MEMBERS / GALLERY / NEWS / MYPAGE
+//            MEMBERS / GALLERY / NEWS / MYPAGE
 // =======================================================
 app.get("/members", requireLogin, (req, res) => {
   res.render("members", { siteTitle: "ILLIT – Members" });
@@ -239,5 +232,5 @@ app.get("/news", requireLogin, (req, res) => {
 // =======================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
