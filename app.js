@@ -36,7 +36,6 @@ app.set("views", path.join(__dirname, "views"));
 
 // Static
 app.use("/img", express.static(path.join(__dirname, "img")));
-app.use(express.static(path.join(__dirname, "..", "illit")));
 app.use(express.static(path.join(__dirname, "public"))); // gallery용
 
 // Body parser
