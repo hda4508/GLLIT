@@ -34,11 +34,17 @@ mongoose
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Static
-app.use("/img", express.static(path.join(__dirname, "img")));
-app.use(express.static(path.join(__dirname, "public"))); // gallery용
 
-// Body parser
+// =======================================================
+//              STATIC FILES (⭐ 순서 매우 중요!)
+// =======================================================
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/img", express.static(path.join(__dirname, "img")));
+
+
+// =======================================================
+//                     BODY PARSER
+// =======================================================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -109,8 +115,6 @@ app.get("/", (req, res) => {
 // =======================================================
 //                     LOGIN / SIGNUP
 // =======================================================
-
-// 로그인
 app.post("/login", async (req, res) => {
   try {
     const { username, email, password = "", next } = req.body;
@@ -144,8 +148,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-// 회원가입
 app.post("/signup", async (req, res) => {
   try {
     let { email, username, nickname, password, passwordConfirm, next } = req.body;
@@ -193,6 +195,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+
 // 로그아웃
 app.post("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/"));
@@ -208,13 +211,11 @@ app.get("/glitz", requireLogin, async (req, res) => {
 
   const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
 
-  res.render("glitz", {
-    siteTitle: "ILLIT – Glitz Zone",
-    posts,
-    mine,
-  });
+  res.render("glitz", { siteTitle: "ILLIT – Glitz Zone", posts, mine });
 });
 
+
+// 닉네임 수정
 app.post("/glitz/nickname", requireLogin, async (req, res) => {
   try {
     const trimmed = req.body.nickname.trim();
@@ -241,6 +242,8 @@ app.post("/glitz/nickname", requireLogin, async (req, res) => {
   }
 });
 
+
+// 글 작성
 app.post("/glitz/post", requireLogin, async (req, res) => {
   try {
     const trimmed = req.body.content.trim();
@@ -259,6 +262,8 @@ app.post("/glitz/post", requireLogin, async (req, res) => {
   }
 });
 
+
+// 수정
 app.post("/glitz/edit/:id", requireLogin, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -280,6 +285,8 @@ app.post("/glitz/edit/:id", requireLogin, async (req, res) => {
   }
 });
 
+
+// 삭제
 app.post("/glitz/delete/:id", requireLogin, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id).lean();
@@ -299,7 +306,7 @@ app.post("/glitz/delete/:id", requireLogin, async (req, res) => {
 
 
 // =======================================================
-//                     FLEA MARKET
+//                     FLEA MARKET (앨범)
 // =======================================================
 app.get("/albums", requireLogin, async (req, res) => {
   try {
@@ -368,10 +375,7 @@ app.get("/albums/edit/:id", requireLogin, async (req, res) => {
   if (String(item.authorId) !== String(req.session.user.id))
     return res.redirect(`/albums/${item._id}`);
 
-  res.render("album_edit", {
-    siteTitle: "상품 수정",
-    item,
-  });
+  res.render("album_edit", { siteTitle: "상품 수정", item });
 });
 
 app.post("/albums/edit/:id", requireLogin, async (req, res) => {
@@ -419,7 +423,7 @@ app.get("/members", requireLogin, (req, res) => {
   res.render("members", { siteTitle: "ILLIT – Members" });
 });
 
-// 🎉 갤러리 라우터 — 최종 확정 버전
+// Gallery Router
 const galleryRoute = require("./routes/gallery");
 app.use("/gallery", requireLogin, galleryRoute);
 
@@ -430,22 +434,25 @@ app.use("/gallery", requireLogin, galleryRoute);
 const scheduleRouter = require("./routes/schedule");
 app.use("/api/schedule", scheduleRouter);
 
-
-// =======================================================
-//                     BASIC PAGES
-// =======================================================
-app.get("/profile", requireLogin, (req, res) => {
-  res.render("profile", { siteTitle: "ILLIT – Profile" });
-});
-
 app.get("/news", requireLogin, (req, res) => {
   res.render("news", { siteTitle: "ILLIT – News" });
 });
 
-// =======================================================
-//                     my page
-// =======================================================
 
+// =======================================================
+//                     PROFILE PAGE
+// =======================================================
+app.get("/profile", requireLogin, (req, res) => {
+  res.render("profile", {
+    siteTitle: "MY PROFILE",
+    user: req.session.user,
+  });
+});
+
+
+// =======================================================
+//                     MY PAGE
+// =======================================================
 const mypageRoutes = require("./routes/mypage");
 app.use("/mypage", mypageRoutes);
 
