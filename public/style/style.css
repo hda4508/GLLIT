@@ -75,7 +75,7 @@ body {
   position: relative;
   height: 110vh;
   overflow: hidden;
-  background: #000 url('../img/maintype.png') center/cover no-repeat;
+  background: #000 url('../img/mainbackground.png') center/cover no-repeat;
 }
 
 .hero::after {
