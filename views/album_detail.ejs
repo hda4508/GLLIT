@@ -49,7 +49,7 @@
 
         .meta-box {
             padding: 18px 0;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .meta-text {
@@ -58,7 +58,7 @@
 
         .detail-desc {
             padding: 22px 0;
-            color: rgba(255,255,255,0.85);
+            color: rgba(255, 255, 255, 0.85);
             min-height: 120px;
         }
 
@@ -74,23 +74,23 @@
             font-size: 15px;
             border-radius: 10px;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.35);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             color: #fff;
             transition: 0.25s;
         }
 
         button:hover {
-            border-color: rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .delete-btn {
-            border-color: rgba(255,50,50,0.4);
+            border-color: rgba(255, 50, 50, 0.4);
         }
 
         .delete-btn:hover {
-            border-color: rgba(255,80,80,0.9);
-            background: rgba(255,30,30,0.05);
+            border-color: rgba(255, 80, 80, 0.9);
+            background: rgba(255, 30, 30, 0.05);
         }
     </style>
 </head>
@@ -101,10 +101,7 @@
     <main class="detail-page">
 
         <!-- 이미지 -->
-        <div class="detail-image"
-            <% if (item.image) { %>
-                style="background-image: url('<%= item.image %>');"
-            <% } %> >
+        <div class="detail-image" <% if (item.image) { %> style="background-image: url('<%= item.image %>');" <% } %>>
         </div>
 
         <!-- 상품 정보 -->
@@ -126,10 +123,9 @@
                 <%= item.description || '등록된 설명이 없습니다.' %>
             </div>
 
-            <!-- 🔥 본인 글만 수정/삭제 가능 -->
-            <% const isMine = (String(item.authorId) === String(user.id)); %>
+            <% const canEdit = (String(item.authorId) === String(user.id) || user.isAdmin); %>
 
-            <% if (isMine) { %>
+            <% if (canEdit) { %>
             <div class="button-row">
 
                 <button onclick="location.href='/albums/edit/<%= item._id %>'">
@@ -143,9 +139,11 @@
             </div>
             <% } %>
 
+
         </div>
 
     </main>
 
 </body>
+
 </html>

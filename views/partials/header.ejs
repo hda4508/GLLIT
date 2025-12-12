@@ -1,5 +1,7 @@
 <header class="site-header">
-    <a class="brand" href="/"><img src="/img/logo.png" alt="ILLIT"></a>
+    <a class="brand" href="/">
+        <img src="/img/logo.png" alt="ILLIT">
+    </a>
 
     <nav class="gnb">
         <a href="/profile">Profile</a>
@@ -9,3 +11,73 @@
         <a href="/glitz" data-protected>Glitz Zone</a>
     </nav>
 </header>
+
+<style>
+/* =====================
+   헤더 전역 보호 스타일
+   어떤 페이지 CSS도 헤더를 망가뜨릴 수 없음
+===================== */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 72px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    box-sizing: border-box !important;
+}
+
+/* 로고 이미지 */
+.site-header .brand img {
+    height: 32px !important;
+    width: auto !important;
+    display: block !important;
+    object-fit: contain;
+}
+
+/* GNB 컨테이너 */
+.site-header .gnb {
+    display: flex !important;
+    align-items: center !important;
+    gap: 28px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ============================
+   💥 헤더 a 태그 절대 보호
+   어떤 페이지 스타일에도 절대 영향받지 않음
+============================= */
+.site-header .gnb a {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    text-decoration: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+
+    display: inline-block;
+    transition: 0.25s;
+}
+
+/* hover */
+.site-header .gnb a:hover {
+    opacity: 0.65 !important;
+}
+
+/* =======================
+   💥 페이지에서 body { font-size } 설정해도 보호
+======================= */
+.site-header, 
+.site-header * {
+    font-size: initial !important;
+    box-sizing: border-box !important;
+}
+</style>

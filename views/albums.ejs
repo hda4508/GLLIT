@@ -8,7 +8,20 @@
     <link rel="stylesheet" href="/style/style.css" />
 
     <style>
-        
+        /* =============================== */
+        /*   헤더가 다른 페이지 CSS 영향 안 받게 보호   */
+        /* =============================== */
+        .site-header a {
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            color: #fff !important;
+        }
+
+        body {
+            background: #000;
+            margin: 0;
+            padding: 0;
+        }
 
         /* ===== 메인 레이아웃 ===== */
         main.market-list {
@@ -18,7 +31,7 @@
         }
 
         /* ===== 상품 등록 버튼 (캡슐 스타일) ===== */
-        .add-btn {
+        .market-list .add-btn {
             display: inline-block;
             padding: 10px 26px;
             background: #000;
@@ -30,7 +43,7 @@
             transition: 0.25s ease;
         }
 
-        .add-btn:hover {
+        .market-list .add-btn:hover {
             background: #181818;
             transform: translateY(-2px);
         }
@@ -102,8 +115,8 @@
             <% items.forEach(item => { %>
             <div class="product-card" onclick="location.href='/albums/<%= item._id %>'">
 
-                <div class="product-thumb" <% if (item.image) { %> style="background-image: url('<%= item.image %>');"
-                    <% } %>>
+                <div class="product-thumb"
+                    <% if (item.image) { %> style="background-image: url('<%= item.image %>');" <% } %>>
                 </div>
 
                 <!-- 상품 제목 -->
@@ -116,7 +129,7 @@
                     <%= item.price ? item.price.toLocaleString() + "원" : "가격 미정" %>
                 </div>
 
-                <!-- ⭐ 작성자 닉네임 표시 (닉네임 변경 시 자동 반영됨) -->
+                <!-- 작성자 닉네임 표시 -->
                 <div class="product-author">
                     작성자: <%= item.authorNickname %>
                 </div>
@@ -126,6 +139,7 @@
         </div>
 
     </main>
+
     <%- include('partials/footer') %>
 </body>
 

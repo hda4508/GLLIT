@@ -14,34 +14,39 @@
             font-family: "Pretendard", sans-serif;
             margin: 0;
             padding: 0;
-            background: #111;
-            overflow-x: hidden; /* 가로 스크롤 방지 */
+            background: #000;
+            overflow-x: hidden;
+            /* 가로 스크롤 방지 */
         }
 
         /* ===== 메인 래퍼 ===== */
         main.profile-main {
-            position: relative; /* 고양이 배경을 main 안에서만 보이게 하기 위함 */
+            position: relative;
+            /* 고양이 배경을 main 안에서만 보이게 하기 위함 */
             padding: 120px 24px 80px;
-            background: #111;
+            background: #000;
             box-sizing: border-box;
-            overflow: hidden; /* 푸터로 이미지가 넘어가는 것 방지 */
+            overflow: hidden;
+            /* 푸터로 이미지가 넘어가는 것 방지 */
         }
 
         .profile-shell {
             max-width: 1150px;
             margin: 0 auto;
             position: relative;
-            z-index: 5; /* 고양이보다 위 */
+            z-index: 5;
+            /* 고양이보다 위 */
         }
 
         /* ===== 고양이 배경 이미지 ===== */
         .bg-cat-wrap {
-            position: absolute;
+            position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            overflow: hidden; /* 이미지가 main 영역 밖으로 보이지 않도록 */
+            overflow: hidden;
+            /* 이미지가 main 영역 밖으로 보이지 않도록 */
             z-index: 1;
         }
 
@@ -49,7 +54,7 @@
         .bg-cat-right {
             position: absolute;
             opacity: 0.18;
-            filter: drop-shadow(0 0 55px rgba(120,150,255,0.55));
+            filter: drop-shadow(0 0 55px rgba(120, 150, 255, 0.55));
             user-select: none;
         }
 
@@ -268,8 +273,9 @@
 
         <!-- 고양이 배경 (푸터에는 절대 안 나옴) -->
         <div class="bg-cat-wrap">
-            <img src="/img/cat2.png" class="bg-cat-left">
-            <img src="/img/cat2.png" class="bg-cat-right">
+            <img src="/img/cat2.png" class="bg-cat-left" width="480" height="480">
+            <img src="/img/cat2.png" class="bg-cat-right" width="420" height="420">
+
         </div>
 
         <div class="profile-shell">
@@ -391,14 +397,18 @@
                         <ul class="award-list">
                             <li class="award-item"><span class="award-date">01.05</span>골든디스크 – 신인상 / 본상</li>
                             <li class="award-item"><span class="award-date">01.07</span>QQ 뮤직 – 올해의 한국 노래상</li>
-                            <li class="award-item"><span class="award-date">01.12</span>Korean Sales Music Awards – Best Debut Song</li>
-                            <li class="award-item"><span class="award-date">01.12</span>Tencent Music Awards – 올해의 K-POP EP 외 다수</li>
+                            <li class="award-item"><span class="award-date">01.12</span>Korean Sales Music Awards – Best
+                                Debut Song</li>
+                            <li class="award-item"><span class="award-date">01.12</span>Tencent Music Awards – 올해의 K-POP
+                                EP 외 다수</li>
                             <li class="award-item"><span class="award-date">01.24</span>스튜디오 춤 – 베스트 퍼포먼스</li>
-                            <li class="award-item"><span class="award-date">02.16</span>한터뮤직어워즈 – Rookie of the Year</li>
+                            <li class="award-item"><span class="award-date">02.16</span>한터뮤직어워즈 – Rookie of the Year
+                            </li>
                             <li class="award-item"><span class="award-date">02.22</span>The Awards – 베스트 코레오그래피 외</li>
                             <li class="award-item"><span class="award-date">03.12</span>일본 골드디스크 – 올해의 노래상</li>
                             <li class="award-item"><span class="award-date">03.18</span>iHeartAwards – 최우수 신인상</li>
-                            <li class="award-item"><span class="award-date">08.21</span>K-World Dream Awards – 본상 / MV상</li>
+                            <li class="award-item"><span class="award-date">08.21</span>K-World Dream Awards – 본상 / MV상
+                            </li>
                             <li class="award-item"><span class="award-date">11.28</span>MAMA – FANS' CHOICE TOP 10</li>
                         </ul>
                     </div>

@@ -15,7 +15,7 @@
 
         body {
             margin: 0;
-            background: #111;
+            background: #000;
             color: #fff;
             overflow-x: hidden !important;
         }
@@ -141,10 +141,10 @@
                 <div class="photo-block">
                     <img src="<%= photo.imageUrl %>" class="masonry-img">
 
-                    <!-- ⭐ 본인이 올린 사진만 삭제 버튼 표시 -->
-                    <% if (user && String(photo.authorId) === String(user.id)) { %>
-                        <div class="delete-btn" onclick="deletePhoto('<%= photo._id %>')">삭제</div>
+                    <% if (user && (String(photo.authorId) === String(user.id) || user.isAdmin)) { %>
+                    <div class="delete-btn" onclick="deletePhoto('<%= photo._id %>')">삭제</div>
                     <% } %>
+
                 </div>
                 <% }) %>
 

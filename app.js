@@ -45,7 +45,9 @@ app.use("/img", express.static(path.join(__dirname, "img")));
 // =======================================================
 //                     BODY PARSER
 // =======================================================
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true
+}));
 app.use(express.json());
 
 
@@ -88,19 +90,19 @@ app.get("/", (req, res) => {
   const errorCode = req.query.error || "";
 
   const errorMessage =
-    errorCode === "notfound"
-      ? "계정을 찾을 수 없습니다."
-      : errorCode === "wrongpw"
-      ? "비밀번호가 올바르지 않습니다."
-      : errorCode === "dup_email"
-      ? "이미 사용 중인 이메일입니다."
-      : errorCode === "dup_username"
-      ? "이미 사용 중인 아이디입니다."
-      : errorCode === "mismatch"
-      ? "비밀번호 확인이 일치하지 않습니다."
-      : errorCode === "invalid"
-      ? "입력값을 확인해 주세요."
-      : "";
+    errorCode === "notfound" ?
+    "계정을 찾을 수 없습니다." :
+    errorCode === "wrongpw" ?
+    "비밀번호가 올바르지 않습니다." :
+    errorCode === "dup_email" ?
+    "이미 사용 중인 이메일입니다." :
+    errorCode === "dup_username" ?
+    "이미 사용 중인 아이디입니다." :
+    errorCode === "mismatch" ?
+    "비밀번호 확인이 일치하지 않습니다." :
+    errorCode === "invalid" ?
+    "입력값을 확인해 주세요." :
+    "";
 
   res.render("main", {
     siteTitle: "ILLIT",
@@ -117,16 +119,27 @@ app.get("/", (req, res) => {
 // =======================================================
 app.post("/login", async (req, res) => {
   try {
-    const { username, email, password = "", next } = req.body;
+    const {
+      username,
+      email,
+      password = "",
+      next
+    } = req.body;
     const identRaw = (username ?? email ?? "").trim();
 
     if (!identRaw) return res.redirect("/?needLogin=1&error=notfound");
 
     const isEmail = /\S+@\S+\.\S+/.test(identRaw);
 
-    const query = isEmail
-      ? { email: { $regex: new RegExp(`^${identRaw}$`, "i") } }
-      : { username: { $regex: new RegExp(`^${identRaw}$`, "i") } };
+    const query = isEmail ? {
+      email: {
+        $regex: new RegExp(`^${identRaw}$`, "i")
+      }
+    } : {
+      username: {
+        $regex: new RegExp(`^${identRaw}$`, "i")
+      }
+    };
 
     const user = await User.findOne(query).select("+password");
     if (!user) return res.redirect("/?needLogin=1&error=notfound");
@@ -139,7 +152,10 @@ app.post("/login", async (req, res) => {
       username: user.username,
       nickname: user.nickname,
       email: user.email || "",
+      isAdmin: user.isAdmin
     };
+
+    console.log("SESSION USER:", req.session.user);
 
     return res.redirect(next || "/");
   } catch (e) {
@@ -150,7 +166,14 @@ app.post("/login", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   try {
-    let { email, username, nickname, password, passwordConfirm, next } = req.body;
+    let {
+      email,
+      username,
+      nickname,
+      password,
+      passwordConfirm,
+      next
+    } = req.body;
 
     if (!username || !nickname || !password)
       return res.redirect("/?needLogin=1&error=invalid");
@@ -163,13 +186,17 @@ app.post("/signup", async (req, res) => {
     const mail = email ? email.trim().toLowerCase() : undefined;
 
     const dupU = await User.findOne({
-      username: { $regex: new RegExp(`^${uname}$`, "i") },
+      username: {
+        $regex: new RegExp(`^${uname}$`, "i")
+      },
     }).lean();
     if (dupU) return res.redirect("/?needLogin=1&error=dup_username");
 
     if (mail) {
       const dupE = await User.findOne({
-        email: { $regex: new RegExp(`^${mail}$`, "i") },
+        email: {
+          $regex: new RegExp(`^${mail}$`, "i")
+        },
       }).lean();
       if (dupE) return res.redirect("/?needLogin=1&error=dup_email");
     }
@@ -207,11 +234,19 @@ app.post("/logout", (req, res) => {
 // =======================================================
 app.get("/glitz", requireLogin, async (req, res) => {
   const mine = req.query.mine === "1";
-  const filter = mine ? { authorId: req.session.user.id } : {};
+  const filter = mine ? {
+    authorId: req.session.user.id
+  } : {};
 
-  const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
+  const posts = await Post.find(filter).sort({
+    createdAt: -1
+  }).lean();
 
-  res.render("glitz", { siteTitle: "ILLIT – Glitz Zone", posts, mine });
+  res.render("glitz", {
+    siteTitle: "ILLIT – Glitz Zone",
+    posts,
+    mine
+  });
 });
 
 
@@ -223,17 +258,23 @@ app.post("/glitz/nickname", requireLogin, async (req, res) => {
     if (trimmed.length < 2 || trimmed.length > 24)
       return res.redirect("/glitz?mine=1&error=invalid_nick");
 
-    await User.updateOne(
-      { _id: req.session.user.id },
-      { $set: { nickname: trimmed } }
-    );
+    await User.updateOne({
+      _id: req.session.user.id
+    }, {
+      $set: {
+        nickname: trimmed
+      }
+    });
 
     req.session.user.nickname = trimmed;
 
-    await Post.updateMany(
-      { authorId: req.session.user.id },
-      { $set: { authorNickname: trimmed } }
-    );
+    await Post.updateMany({
+      authorId: req.session.user.id
+    }, {
+      $set: {
+        authorNickname: trimmed
+      }
+    });
 
     return res.redirect("/glitz?mine=1&updated=nick");
   } catch (e) {
@@ -269,7 +310,8 @@ app.post("/glitz/edit/:id", requireLogin, async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.redirect("/glitz");
 
-    if (String(post.authorId) !== req.session.user.id)
+    // 작성자 본인 OR 관리자 허용
+    if (String(post.authorId) !== req.session.user.id && !req.session.user.isAdmin)
       return res.redirect("/glitz");
 
     const trimmed = req.body.content.trim();
@@ -292,10 +334,13 @@ app.post("/glitz/delete/:id", requireLogin, async (req, res) => {
     const post = await Post.findById(req.params.id).lean();
     if (!post) return res.redirect("/glitz");
 
-    if (String(post.authorId) !== String(req.session.user.id))
+    // 작성자 본인 OR 관리자 허용
+    if (String(post.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
       return res.redirect("/glitz");
 
-    await Post.deleteOne({ _id: post._id });
+    await Post.deleteOne({
+      _id: post._id
+    });
 
     res.redirect("/glitz");
   } catch (e) {
@@ -305,12 +350,15 @@ app.post("/glitz/delete/:id", requireLogin, async (req, res) => {
 });
 
 
+
 // =======================================================
 //                     FLEA MARKET (앨범)
 // =======================================================
 app.get("/albums", requireLogin, async (req, res) => {
   try {
-    const items = await Item.find().sort({ createdAt: -1 }).lean();
+    const items = await Item.find().sort({
+      createdAt: -1
+    }).lean();
 
     res.render("albums", {
       siteTitle: "ILLIT – Flea Market",
@@ -327,12 +375,20 @@ app.get("/albums", requireLogin, async (req, res) => {
 });
 
 app.get("/albums/new", requireLogin, (req, res) => {
-  res.render("album_new", { siteTitle: "상품 등록" });
+  res.render("album_new", {
+    siteTitle: "상품 등록"
+  });
 });
 
 app.post("/albums/new", requireLogin, async (req, res) => {
   try {
-    const { title, price, location, image, description } = req.body;
+    const {
+      title,
+      price,
+      location,
+      image,
+      description
+    } = req.body;
 
     await Item.create({
       authorId: req.session.user.id,
@@ -372,19 +428,30 @@ app.get("/albums/edit/:id", requireLogin, async (req, res) => {
   const item = await Item.findById(req.params.id).lean();
   if (!item) return res.redirect("/albums");
 
-  if (String(item.authorId) !== String(req.session.user.id))
-    return res.redirect(`/albums/${item._id}`);
+  if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
+  return res.redirect(`/albums/${item._id}`);
 
-  res.render("album_edit", { siteTitle: "상품 수정", item });
+
+
+  res.render("album_edit", {
+    siteTitle: "상품 수정",
+    item
+  });
 });
 
 app.post("/albums/edit/:id", requireLogin, async (req, res) => {
-  const { title, price, location, image, description } = req.body;
+  const {
+    title,
+    price,
+    location,
+    image,
+    description
+  } = req.body;
 
   const item = await Item.findById(req.params.id);
   if (!item) return res.redirect("/albums");
 
-  if (String(item.authorId) !== String(req.session.user.id))
+  if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
     return res.redirect(`/albums/${item._id}`);
 
   item.title = title;
@@ -403,10 +470,13 @@ app.post("/albums/:id/delete", requireLogin, async (req, res) => {
     const item = await Item.findById(req.params.id).lean();
     if (!item) return res.redirect("/albums");
 
-    if (String(item.authorId) !== String(req.session.user.id))
-      return res.redirect(`/albums/${item._id}`);
+    if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
+    return res.redirect(`/albums/${item._id}`);
 
-    await Item.deleteOne({ _id: item._id });
+
+    await Item.deleteOne({
+      _id: item._id
+    });
 
     res.redirect("/albums");
   } catch (err) {
@@ -420,7 +490,9 @@ app.post("/albums/:id/delete", requireLogin, async (req, res) => {
 //                     MEMBERS + GALLERY
 // =======================================================
 app.get("/members", requireLogin, (req, res) => {
-  res.render("members", { siteTitle: "ILLIT – Members" });
+  res.render("members", {
+    siteTitle: "ILLIT – Members"
+  });
 });
 
 // Gallery Router
@@ -435,7 +507,9 @@ const scheduleRouter = require("./routes/schedule");
 app.use("/api/schedule", scheduleRouter);
 
 app.get("/news", requireLogin, (req, res) => {
-  res.render("news", { siteTitle: "ILLIT – News" });
+  res.render("news", {
+    siteTitle: "ILLIT – News"
+  });
 });
 
 

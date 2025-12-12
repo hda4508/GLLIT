@@ -90,9 +90,12 @@ router.post("/delete/:photoId", requireLogin, async (req, res) => {
             return res.json({ success: false, message: "사진 없음" });
         }
 
-        // 올린 사람만 삭제 가능하게
-        if (String(targetPhoto.authorId) !== String(req.session.user.id)) {
-            return res.json({ success: false, message: "권한 없음" });
+        // ⭐ 관리자면 무조건 삭제 가능
+        if (!req.session.user.isAdmin) {
+            // 일반 유저는 본인 여부 체크
+            if (String(targetPhoto.authorId) !== String(req.session.user.id)) {
+                return res.json({ success: false, message: "권한 없음" });
+            }
         }
 
         await Gallery.updateOne(

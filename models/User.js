@@ -25,10 +25,16 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+
+  // ⭐ 관리자 여부
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+
 }, {
   timestamps: true
 });
-
 
 //  비밀번호 해시 (저장 전)
 userSchema.pre("save", async function (next) {
@@ -48,9 +54,7 @@ userSchema.pre("findOneAndDelete", async function (next) {
     const doc = await this.model.findOne(this.getFilter()).select("_id");
     if (doc) {
       const Post = require("./Post");
-      await Post.deleteMany({
-        authorId: doc._id
-      });
+      await Post.deleteMany({ authorId: doc._id });
       console.log(`🧹 Deleted posts by user ${doc._id}`);
     }
     next();
@@ -60,18 +64,13 @@ userSchema.pre("findOneAndDelete", async function (next) {
   }
 });
 
-userSchema.pre("deleteOne", {
-  document: false,
-  query: true
-}, async function (next) {
+userSchema.pre("deleteOne", { document: false, query: true }, async function (next) {
   try {
     const doc = await this.model.findOne(this.getFilter()).select("_id");
     if (doc) {
       const Post = require("./Post");
-      await Post.deleteMany({
-        authorId: doc._id
-      });
-      console.log(` Deleted posts by user ${doc._id}`);
+      await Post.deleteMany({ authorId: doc._id });
+      console.log(`🧹 Deleted posts by user ${doc._id}`);
     }
     next();
   } catch (e) {
@@ -80,15 +79,10 @@ userSchema.pre("deleteOne", {
   }
 });
 
-userSchema.pre("deleteOne", {
-  document: true,
-  query: false
-}, async function (next) {
+userSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
   try {
     const Post = require("./Post");
-    await Post.deleteMany({
-      authorId: this._id
-    });
+    await Post.deleteMany({ authorId: this._id });
     console.log(`🧹 Deleted posts by user ${this._id}`);
     next();
   } catch (e) {
