@@ -55,7 +55,7 @@ userSchema.pre("findOneAndDelete", async function (next) {
     }
     next();
   } catch (e) {
-    console.error("❌ Cascade delete (findOneAndDelete) failed:", e);
+    console.error(" Cascade delete (findOneAndDelete) failed:", e);
     next(e);
   }
 });
@@ -71,11 +71,11 @@ userSchema.pre("deleteOne", {
       await Post.deleteMany({
         authorId: doc._id
       });
-      console.log(`🧹 Deleted posts by user ${doc._id}`);
+      console.log(` Deleted posts by user ${doc._id}`);
     }
     next();
   } catch (e) {
-    console.error("❌ Cascade delete (deleteOne query) failed:", e);
+    console.error(" Cascade delete (deleteOne query) failed:", e);
     next(e);
   }
 });
@@ -92,7 +92,7 @@ userSchema.pre("deleteOne", {
     console.log(`🧹 Deleted posts by user ${this._id}`);
     next();
   } catch (e) {
-    console.error("❌ Cascade delete (deleteOne doc) failed:", e);
+    console.error(" Cascade delete (deleteOne doc) failed:", e);
     next(e);
   }
 });

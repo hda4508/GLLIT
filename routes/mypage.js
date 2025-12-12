@@ -74,7 +74,7 @@ router.post("/username", requireLogin, async (req, res) => {
 
     await User.updateOne({ _id: req.session.user.id }, { username });
 
-    // ⭐ 세션 갱신
+    //  세션 갱신
     req.session.user.username = username;
 
     res.redirect("/mypage?updated=username");

@@ -22,10 +22,10 @@ const Item = require("./models/Item");
 mongoose
   .connect(process.env.DB_CONNECT)
   .then(() => {
-    console.log("✅ MongoDB connected");
+    console.log(" MongoDB connected");
     console.log("DB name:", mongoose.connection.name);
   })
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => console.error(" MongoDB connection error:", err));
 
 
 // =======================================================
@@ -36,7 +36,7 @@ app.set("views", path.join(__dirname, "views"));
 
 
 // =======================================================
-//              STATIC FILES (⭐ 순서 매우 중요!)
+//              STATIC FILES ( 순서 매우 중요!)
 // =======================================================
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/img", express.static(path.join(__dirname, "img")));
@@ -462,5 +462,5 @@ app.use("/mypage", mypageRoutes);
 // =======================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(` Server running on http://localhost:${PORT}`);
 });

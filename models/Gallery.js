@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const photoSchema = new mongoose.Schema({
     imageUrl: { type: String, required: true },
 
-    // ⭐ 작성자 정보 추가
+    //  작성자 정보 추가
     authorId: { type: String, required: true },
     authorNickname: { type: String, required: true },
 
