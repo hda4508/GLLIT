@@ -22,10 +22,10 @@ const Item = require("./models/Item");
 mongoose
   .connect(process.env.DB_CONNECT)
   .then(() => {
-    console.log(" MongoDB connected");
+    console.log("MongoDB connected");
     console.log("DB name:", mongoose.connection.name);
   })
-  .catch((err) => console.error(" MongoDB connection error:", err));
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 
 // =======================================================
@@ -36,18 +36,15 @@ app.set("views", path.join(__dirname, "views"));
 
 
 // =======================================================
-//              STATIC FILES ( 순서 매우 중요!)
+//              STATIC FILES (Render 대응)
 // =======================================================
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/img", express.static(path.join(__dirname, "img")));
 
 
 // =======================================================
 //                     BODY PARSER
 // =======================================================
-app.use(express.urlencoded({
-  extended: true
-}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
@@ -75,8 +72,23 @@ app.use((req, res, next) => {
   next();
 });
 
+
+// =======================================================
+//               LOGIN GUARD (중요 수정)
+// =======================================================
 function requireLogin(req, res, next) {
+  // 메인 + 정적 파일은 예외
+  if (
+    req.path === "/" ||
+    req.path.startsWith("/img") ||
+    req.path.startsWith("/style") ||
+    req.path.startsWith("/js")
+  ) {
+    return next();
+  }
+
   if (req.session.user) return next();
+
   return res.redirect(`/?needLogin=1&next=${encodeURIComponent(req.originalUrl)}`);
 }
 
@@ -90,18 +102,12 @@ app.get("/", (req, res) => {
   const errorCode = req.query.error || "";
 
   const errorMessage =
-    errorCode === "notfound" ?
-    "계정을 찾을 수 없습니다." :
-    errorCode === "wrongpw" ?
-    "비밀번호가 올바르지 않습니다." :
-    errorCode === "dup_email" ?
-    "이미 사용 중인 이메일입니다." :
-    errorCode === "dup_username" ?
-    "이미 사용 중인 아이디입니다." :
-    errorCode === "mismatch" ?
-    "비밀번호 확인이 일치하지 않습니다." :
-    errorCode === "invalid" ?
-    "입력값을 확인해 주세요." :
+    errorCode === "notfound" ? "계정을 찾을 수 없습니다." :
+    errorCode === "wrongpw" ? "비밀번호가 올바르지 않습니다." :
+    errorCode === "dup_email" ? "이미 사용 중인 이메일입니다." :
+    errorCode === "dup_username" ? "이미 사용 중인 아이디입니다." :
+    errorCode === "mismatch" ? "비밀번호 확인이 일치하지 않습니다." :
+    errorCode === "invalid" ? "입력값을 확인해 주세요." :
     "";
 
   res.render("main", {
@@ -119,27 +125,16 @@ app.get("/", (req, res) => {
 // =======================================================
 app.post("/login", async (req, res) => {
   try {
-    const {
-      username,
-      email,
-      password = "",
-      next
-    } = req.body;
+    const { username, email, password = "", next } = req.body;
     const identRaw = (username ?? email ?? "").trim();
 
     if (!identRaw) return res.redirect("/?needLogin=1&error=notfound");
 
     const isEmail = /\S+@\S+\.\S+/.test(identRaw);
 
-    const query = isEmail ? {
-      email: {
-        $regex: new RegExp(`^${identRaw}$`, "i")
-      }
-    } : {
-      username: {
-        $regex: new RegExp(`^${identRaw}$`, "i")
-      }
-    };
+    const query = isEmail
+      ? { email: { $regex: new RegExp(`^${identRaw}$`, "i") } }
+      : { username: { $regex: new RegExp(`^${identRaw}$`, "i") } };
 
     const user = await User.findOne(query).select("+password");
     if (!user) return res.redirect("/?needLogin=1&error=notfound");
@@ -152,7 +147,7 @@ app.post("/login", async (req, res) => {
       username: user.username,
       nickname: user.nickname,
       email: user.email || "",
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
     };
 
     console.log("SESSION USER:", req.session.user);
@@ -166,14 +161,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   try {
-    let {
-      email,
-      username,
-      nickname,
-      password,
-      passwordConfirm,
-      next
-    } = req.body;
+    let { email, username, nickname, password, passwordConfirm, next } = req.body;
 
     if (!username || !nickname || !password)
       return res.redirect("/?needLogin=1&error=invalid");
@@ -185,28 +173,15 @@ app.post("/signup", async (req, res) => {
     const nick = nickname.trim();
     const mail = email ? email.trim().toLowerCase() : undefined;
 
-    const dupU = await User.findOne({
-      username: {
-        $regex: new RegExp(`^${uname}$`, "i")
-      },
-    }).lean();
+    const dupU = await User.findOne({ username: { $regex: new RegExp(`^${uname}$`, "i") } });
     if (dupU) return res.redirect("/?needLogin=1&error=dup_username");
 
     if (mail) {
-      const dupE = await User.findOne({
-        email: {
-          $regex: new RegExp(`^${mail}$`, "i")
-        },
-      }).lean();
+      const dupE = await User.findOne({ email: { $regex: new RegExp(`^${mail}$`, "i") } });
       if (dupE) return res.redirect("/?needLogin=1&error=dup_email");
     }
 
-    const user = await User.create({
-      email: mail,
-      username: uname,
-      nickname: nick,
-      password,
-    });
+    const user = await User.create({ email: mail, username: uname, nickname: nick, password });
 
     req.session.user = {
       id: user._id.toString(),
@@ -222,8 +197,6 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-
-// 로그아웃
 app.post("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/"));
 });
@@ -234,287 +207,51 @@ app.post("/logout", (req, res) => {
 // =======================================================
 app.get("/glitz", requireLogin, async (req, res) => {
   const mine = req.query.mine === "1";
-  const filter = mine ? {
-    authorId: req.session.user.id
-  } : {};
+  const filter = mine ? { authorId: req.session.user.id } : {};
 
-  const posts = await Post.find(filter).sort({
-    createdAt: -1
-  }).lean();
+  const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
 
   res.render("glitz", {
     siteTitle: "ILLIT – Glitz Zone",
     posts,
-    mine
+    mine,
   });
 });
 
 
-// 닉네임 수정
-app.post("/glitz/nickname", requireLogin, async (req, res) => {
-  try {
-    const trimmed = req.body.nickname.trim();
-
-    if (trimmed.length < 2 || trimmed.length > 24)
-      return res.redirect("/glitz?mine=1&error=invalid_nick");
-
-    await User.updateOne({
-      _id: req.session.user.id
-    }, {
-      $set: {
-        nickname: trimmed
-      }
-    });
-
-    req.session.user.nickname = trimmed;
-
-    await Post.updateMany({
-      authorId: req.session.user.id
-    }, {
-      $set: {
-        authorNickname: trimmed
-      }
-    });
-
-    return res.redirect("/glitz?mine=1&updated=nick");
-  } catch (e) {
-    console.error(e);
-    return res.redirect("/glitz?mine=1&error=nick_fail");
-  }
-});
-
-
-// 글 작성
-app.post("/glitz/post", requireLogin, async (req, res) => {
-  try {
-    const trimmed = req.body.content.trim();
-    if (!trimmed) return res.redirect("/glitz");
-
-    await Post.create({
-      authorId: req.session.user.id,
-      authorNickname: req.session.user.nickname,
-      content: trimmed,
-    });
-
-    res.redirect("/glitz");
-  } catch (e) {
-    console.error(e);
-    res.redirect("/glitz");
-  }
-});
-
-
-// 수정
-app.post("/glitz/edit/:id", requireLogin, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.redirect("/glitz");
-
-    // 작성자 본인 OR 관리자 허용
-    if (String(post.authorId) !== req.session.user.id && !req.session.user.isAdmin)
-      return res.redirect("/glitz");
-
-    const trimmed = req.body.content.trim();
-    if (!trimmed) return res.redirect("/glitz");
-
-    post.content = trimmed;
-    await post.save();
-
-    res.redirect("/glitz?mine=1");
-  } catch (e) {
-    console.error(e);
-    res.redirect("/glitz");
-  }
-});
-
-
-// 삭제
-app.post("/glitz/delete/:id", requireLogin, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id).lean();
-    if (!post) return res.redirect("/glitz");
-
-    // 작성자 본인 OR 관리자 허용
-    if (String(post.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
-      return res.redirect("/glitz");
-
-    await Post.deleteOne({
-      _id: post._id
-    });
-
-    res.redirect("/glitz");
-  } catch (e) {
-    console.error(e);
-    res.redirect("/glitz");
-  }
-});
-
-
-
 // =======================================================
-//                     FLEA MARKET (앨범)
+//                     FLEA MARKET
 // =======================================================
 app.get("/albums", requireLogin, async (req, res) => {
-  try {
-    const items = await Item.find().sort({
-      createdAt: -1
-    }).lean();
-
-    res.render("albums", {
-      siteTitle: "ILLIT – Flea Market",
-      items,
-    });
-  } catch (e) {
-    console.error("Album load error:", e);
-
-    res.render("albums", {
-      siteTitle: "ILLIT – Flea Market",
-      items: [],
-    });
-  }
-});
-
-app.get("/albums/new", requireLogin, (req, res) => {
-  res.render("album_new", {
-    siteTitle: "상품 등록"
-  });
-});
-
-app.post("/albums/new", requireLogin, async (req, res) => {
-  try {
-    const {
-      title,
-      price,
-      location,
-      image,
-      description
-    } = req.body;
-
-    await Item.create({
-      authorId: req.session.user.id,
-      authorNickname: req.session.user.nickname,
-      title,
-      price: price ? Number(price) : null,
-      location,
-      image,
-      description,
-    });
-
-    res.redirect("/albums");
-  } catch (err) {
-    console.error("Item create error:", err);
-    res.redirect("/albums/new");
-  }
-});
-
-app.get("/albums/:id", requireLogin, async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id).lean();
-    if (!item) return res.redirect("/albums");
-
-    res.render("album_detail", {
-      siteTitle: "상품 상세",
-      item,
-      user: req.session.user,
-    });
-
-  } catch (e) {
-    console.error(e);
-    res.redirect("/albums");
-  }
-});
-
-app.get("/albums/edit/:id", requireLogin, async (req, res) => {
-  const item = await Item.findById(req.params.id).lean();
-  if (!item) return res.redirect("/albums");
-
-  if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
-  return res.redirect(`/albums/${item._id}`);
-
-
-
-  res.render("album_edit", {
-    siteTitle: "상품 수정",
-    item
-  });
-});
-
-app.post("/albums/edit/:id", requireLogin, async (req, res) => {
-  const {
-    title,
-    price,
-    location,
-    image,
-    description
-  } = req.body;
-
-  const item = await Item.findById(req.params.id);
-  if (!item) return res.redirect("/albums");
-
-  if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
-    return res.redirect(`/albums/${item._id}`);
-
-  item.title = title;
-  item.price = price ? Number(price) : null;
-  item.location = location;
-  item.image = image;
-  item.description = description;
-
-  await item.save();
-
-  res.redirect(`/albums/${item._id}`);
-});
-
-app.post("/albums/:id/delete", requireLogin, async (req, res) => {
-  try {
-    const item = await Item.findById(req.params.id).lean();
-    if (!item) return res.redirect("/albums");
-
-    if (String(item.authorId) !== String(req.session.user.id) && !req.session.user.isAdmin)
-    return res.redirect(`/albums/${item._id}`);
-
-
-    await Item.deleteOne({
-      _id: item._id
-    });
-
-    res.redirect("/albums");
-  } catch (err) {
-    console.error(err);
-    res.redirect("/albums");
-  }
+  const items = await Item.find().sort({ createdAt: -1 }).lean();
+  res.render("albums", { siteTitle: "ILLIT – Flea Market", items });
 });
 
 
 // =======================================================
-//                     MEMBERS + GALLERY
+//                     MEMBERS / GALLERY
 // =======================================================
 app.get("/members", requireLogin, (req, res) => {
-  res.render("members", {
-    siteTitle: "ILLIT – Members"
-  });
+  res.render("members", { siteTitle: "ILLIT – Members" });
 });
 
-// Gallery Router
 const galleryRoute = require("./routes/gallery");
 app.use("/gallery", requireLogin, galleryRoute);
 
 
 // =======================================================
-//                     NEWS (CALENDAR)
+//                     NEWS
 // =======================================================
 const scheduleRouter = require("./routes/schedule");
 app.use("/api/schedule", scheduleRouter);
 
 app.get("/news", requireLogin, (req, res) => {
-  res.render("news", {
-    siteTitle: "ILLIT – News"
-  });
+  res.render("news", { siteTitle: "ILLIT – News" });
 });
 
 
 // =======================================================
-//                     PROFILE PAGE
+//                     PROFILE
 // =======================================================
 app.get("/profile", requireLogin, (req, res) => {
   res.render("profile", {
@@ -528,13 +265,13 @@ app.get("/profile", requireLogin, (req, res) => {
 //                     MY PAGE
 // =======================================================
 const mypageRoutes = require("./routes/mypage");
-app.use("/mypage", mypageRoutes);
+app.use("/mypage", requireLogin, mypageRoutes);
 
 
 // =======================================================
-//                     START SERVER
+//                     START SERVER (Render)
 // =======================================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(` Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
